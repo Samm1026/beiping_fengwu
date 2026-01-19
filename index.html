@@ -1338,12 +1338,21 @@
 
     <script>
         // 开场逻辑 - 确保在全局作用域中定义，以便按钮的onclick事件能够调用它
-        function enterSite() {
-            const overlay = document.getElementById('intro-overlay');
-            overlay.style.opacity = '0';
-            overlay.style.visibility = 'hidden';
-            // 保持音乐播放，不中断用户体验
-        }
+     function enterSite() {
+    const overlay = document.getElementById('intro-overlay');
+    overlay.style.opacity = '0';
+    overlay.style.visibility = 'hidden';
+
+    // ✅ 新增：触发背景音乐播放
+    const audio = document.getElementById('background-audio');
+    const audioBtn = document.getElementById('audio-btn');
+    if(audio) {
+        audio.play().then(() => {
+            // 如果成功，让按钮也显示为播放状态
+            if (audioBtn) audioBtn.classList.add('playing');
+        }).catch(e => console.log("播放失败:", e));
+    }
+}
 
         // 页面加载后初始化
         document.addEventListener('DOMContentLoaded', () => {
