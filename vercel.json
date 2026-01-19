@@ -8,6 +8,10 @@
     {
       "src": "*.html",
       "use": "@vercel/static"
+    },
+    {
+      "src": "**/*.{jpg,jpeg,png,gif,svg,ico,css,js,mp3,mp4}",
+      "use": "@vercel/static"
     }
   ],
   "routes": [
