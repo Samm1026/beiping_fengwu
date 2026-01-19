@@ -116,14 +116,14 @@
         /* 鼠标悬停时的图片动效 */
         .article-block:hover .project-img {
             transform: scale(1.02);
-            filter: sepia(0);
+            filter: sepia(0);image/
         }
 
         /* --- 0. 开场动画 --- */
         #intro-overlay {
             position: fixed; inset: 0; z-index: 9999;
             /* 使用beijing图片作为底图 */
-            background: url('beijing.jpg') center/cover no-repeat;
+            background: url('image/beijing.jpg') center/cover no-repeat;
             color: var(--c-paper);
             display: flex; flex-direction: column; align-items: center; justify-content: center;
             transition: opacity 1s ease, visibility 1s;
@@ -2142,66 +2142,42 @@ function enterSite() {
             });
         }
     </script>
-    <script>
-    // --- AI语言大模型功能 (真实后端接入) --- //
+<script>
+    // --- AI语言大模型功能 (修复版) --- //
 
-    // 1. 定义后端地址 (本地开发用 localhost，上线后改为真实域名)
+    // 1. 配置信息 (智谱清言 API)
     const API_KEY = 'dbeee851b40b4654910afb61853d9b5d.Pdly9gA9ZsIHIsod'; 
     const API_URL = 'https://open.bigmodel.cn/api/paas/v4/chat/completions';
 
-    async function sendMessage() {
-        const userMessage = chatInput.value.trim();
-        if (!userMessage) return;
-
-        addMessage(userMessage, true);
-        chatInput.value = '';
-        chatInput.disabled = true;
-        addMessage('', false, true);
-
-        try {
-            // 2. 直接请求智谱官方接口
-            const response = await fetch(API_URL, {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json',
-                    'Authorization': `Bearer ${API_KEY}`
-                },
-                body: JSON.stringify({
-                    model: "glm-4-flash",
-                    messages: [
-                        { role: 'system', content: '你叫“北平风物君”，是“北平风物记”网站的智能导游...' },
-                        ...conversationHistory.flatMap(h => h.parts ? [{role: h.role === 'model'?'assistant':'user', content: h.parts[0].text}] : []),
-                        { role: 'user', content: userMessage }
-                    ],
-                    stream: false
-                })
-            });
-
-            const data = await response.json();
-    // 维护一个简单的客户端对话历史，发给后端保持上下文
-    let conversationHistory = [];
-
-    // AI助手DOM元素
-    // 注意：这里使用 var 或不使用 const/let 重新获取，防止和上方其他逻辑冲突
-    // 但因为我们删除了旧代码，这里用 const 是安全的
+    // 2. 获取 DOM 元素
     const aiBtn = document.getElementById('ai-btn');
     const aiChat = document.getElementById('ai-chat');
     const chatMessages = document.getElementById('chat-messages');
     const chatInput = document.getElementById('chat-input');
     const sendBtn = document.getElementById('send-btn');
+    
+    // 维护对话历史
+    let conversationHistory = [];
 
-    // 切换AI聊天窗口
+    // 3. 切换聊天窗口显示/隐藏
     function toggleAIChat() {
+        // 检查元素是否存在
+        if (!aiChat) return;
+        
         const isHidden = aiChat.style.display === 'none' || aiChat.style.display === '';
         aiChat.style.display = isHidden ? 'flex' : 'none';
         if (isHidden) {
             // 打开时自动聚焦输入框
-            setTimeout(() => chatInput.focus(), 100);
+            setTimeout(() => {
+                if(chatInput) chatInput.focus();
+            }, 100);
         }
     }
 
-    // 添加消息到界面
+    // 4. 添加消息到界面
     function addMessage(text, isUser = false, isLoading = false) {
+        if (!chatMessages) return;
+
         const messageDiv = document.createElement('div');
         
         // 设置样式
@@ -2229,9 +2205,10 @@ function enterSite() {
             word-wrap: break-word;
             box-shadow: 0 2px 5px rgba(0,0,0,0.05);
             line-height: 1.5;
+            text-align: left; 
         `;
 
-        // 如果是 AI 回复，简单处理一下 Markdown 加粗
+        // 简单处理加粗
         if (!isUser && !isLoading) {
             text = text.replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>');
         }
@@ -2241,79 +2218,96 @@ function enterSite() {
         chatMessages.scrollTop = chatMessages.scrollHeight;
     }
 
-    // 发送消息给后端
+    // 5. 发送消息逻辑
     async function sendMessage() {
         const userMessage = chatInput.value.trim();
         if (!userMessage) return;
 
-        // 1. 显示用户消息
+        // 显示用户消息
         addMessage(userMessage, true);
         chatInput.value = '';
         chatInput.disabled = true;
 
-        // 2. 显示“思考中”状态
+        // 显示思考中
         addMessage('', false, true);
 
         try {
-            // 3. 调用我们刚才写的 server.js
-            const response = await fetch('/api/chat', { // 确保端口是 3000
+            // 构建请求数据
+            const payload = {
+                model: "glm-4-flash",
+                messages: [
+                    { role: 'system', content: '你叫“北平风物君”，是“北平风物记”网站的智能导游。请用优雅、文学性的语言回答关于北京文化、历史和旅游的问题。' },
+                    ...conversationHistory,
+                    { role: 'user', content: userMessage }
+                ],
+                stream: false
+            };
+
+            const response = await fetch(API_URL, {
                 method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({ 
-                    message: userMessage,
-                    history: conversationHistory // 将历史记录传给后端
-                })
+                headers: {
+                    'Content-Type': 'application/json',
+                    'Authorization': `Bearer ${API_KEY}`
+                },
+                body: JSON.stringify(payload)
             });
 
             const data = await response.json();
 
-            // 4. 移除加载动画
+            // 移除加载动画
             const loadingDiv = document.getElementById('ai-loading');
             if (loadingDiv) loadingDiv.remove();
 
-            // 5. 显示 AI 回复
-            if (data.reply) {
-                addMessage(data.reply, false);
+            // 处理回复
+            if (data.choices && data.choices.length > 0) {
+                const aiReply = data.choices[0].message.content;
+                addMessage(aiReply, false);
                 
-                // 更新本地历史记录 (Google Gemini 格式，我们后端做了转换适配)
-                conversationHistory.push({ role: "user", parts: [{ text: userMessage }] });
-                conversationHistory.push({ role: "model", parts: [{ text: data.reply }] });
+                // 更新历史记录
+                conversationHistory.push({ role: "user", content: userMessage });
+                conversationHistory.push({ role: "assistant", content: aiReply });
                 
-                // 保持历史记录不要太长，防止消耗太多 Token
-                if(conversationHistory.length > 10) conversationHistory = conversationHistory.slice(-10);
+                // 限制历史记录长度
+                if(conversationHistory.length > 6) conversationHistory = conversationHistory.slice(-6);
             } else {
-                addMessage("抱歉，我好像没听清...", false);
+                addMessage("风物君似乎走神了，请稍后再试。", false);
             }
 
         } catch (error) {
-            console.error("Chat Error:", error);
+            console.error("API Error:", error);
             const loadingDiv = document.getElementById('ai-loading');
             if (loadingDiv) loadingDiv.remove();
-            // 修改报错提示，让它更友好
-            addMessage("风物君正在闭关修炼（请确认 server.js 是否运行，且 API Key 是否正确）。", false);
+            addMessage("网络连接似乎断了，请检查网络设置。", false);
         } finally {
             chatInput.disabled = false;
             chatInput.focus();
         }
     }
 
-    // 事件监听
-    // 为了防止重复绑定，先判断元素是否存在
-    if (aiBtn) aiBtn.addEventListener('click', toggleAIChat);
-    if (sendBtn) sendBtn.addEventListener('click', sendMessage);
-    if (chatInput) {
-        chatInput.addEventListener('keypress', (e) => {
-            if (e.key === 'Enter') sendMessage();
-        });
-    }
-
-    // 点击外部关闭窗口逻辑
-    document.addEventListener('click', (e) => {
-        if (aiChat.style.display === 'flex' && !aiChat.contains(e.target) && !aiBtn.contains(e.target)) {
-            aiChat.style.display = 'none';
+    // 6. 绑定事件监听 (确保 DOM 加载后执行)
+    document.addEventListener('DOMContentLoaded', () => {
+        // 绑定按钮点击
+        if (aiBtn) {
+            aiBtn.onclick = toggleAIChat; // 显式绑定
         }
-    });
 
+        if (sendBtn) {
+            sendBtn.onclick = sendMessage;
+        }
+
+        if (chatInput) {
+            chatInput.addEventListener('keypress', (e) => {
+                if (e.key === 'Enter') sendMessage();
+            });
+        }
+
+        // 点击外部关闭窗口
+        document.addEventListener('click', (e) => {
+            if (aiChat && aiBtn && aiChat.style.display === 'flex' && !aiChat.contains(e.target) && !aiBtn.contains(e.target)) {
+                aiChat.style.display = 'none';
+            }
+        });
+    });
 </script>
 </body>
 </html>
