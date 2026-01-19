@@ -1339,23 +1339,19 @@
     <script>
         // 开场逻辑 - 确保在全局作用域中定义，以便按钮的onclick事件能够调用它
 function enterSite() {
-    // 1. 关掉遮罩
     const overlay = document.getElementById('intro-overlay');
-    overlay.style.opacity = '0';
-    overlay.style.visibility = 'hidden';
-
-    // 2. 【新增】强制开始播放音乐！
-    const audio = document.getElementById('background-audio');
-    const audioBtn = document.getElementById('audio-btn'); // 获取右下角的那个音乐按钮
+    if(overlay) {
+        overlay.style.opacity = '0';
+        setTimeout(() => overlay.style.visibility = 'hidden', 1000);
+    }
     
+    // 强制播放音频
+    const audio = document.getElementById('background-audio');
+    const audioBtn = document.getElementById('audio-btn');
     if (audio) {
         audio.play().then(() => {
-            console.log("背景音乐启动成功！");
-            // 让右下角的按钮也变成“播放中”的波纹状态
             if (audioBtn) audioBtn.classList.add('playing');
-        }).catch(error => {
-            console.log("播放失败，可能是文件路径不对:", error);
-        });
+        }).catch(e => console.log("请点击右下角按钮播放音乐", e));
     }
 }
 
@@ -2150,7 +2146,38 @@ function enterSite() {
     // --- AI语言大模型功能 (真实后端接入) --- //
 
     // 1. 定义后端地址 (本地开发用 localhost，上线后改为真实域名)
-    const API_URL = 'http://localhost:3000/api/chat';
+    const API_KEY = 'dbeee851b40b4654910afb61853d9b5d.Pdly9gA9ZsIHIsod'; 
+    const API_URL = 'https://open.bigmodel.cn/api/paas/v4/chat/completions';
+
+    async function sendMessage() {
+        const userMessage = chatInput.value.trim();
+        if (!userMessage) return;
+
+        addMessage(userMessage, true);
+        chatInput.value = '';
+        chatInput.disabled = true;
+        addMessage('', false, true);
+
+        try {
+            // 2. 直接请求智谱官方接口
+            const response = await fetch(API_URL, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'Authorization': `Bearer ${API_KEY}`
+                },
+                body: JSON.stringify({
+                    model: "glm-4-flash",
+                    messages: [
+                        { role: 'system', content: '你叫“北平风物君”，是“北平风物记”网站的智能导游...' },
+                        ...conversationHistory.flatMap(h => h.parts ? [{role: h.role === 'model'?'assistant':'user', content: h.parts[0].text}] : []),
+                        { role: 'user', content: userMessage }
+                    ],
+                    stream: false
+                })
+            });
+
+            const data = await response.json();
     // 维护一个简单的客户端对话历史，发给后端保持上下文
     let conversationHistory = [];
 
