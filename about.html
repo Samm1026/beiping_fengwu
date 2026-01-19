@@ -1,0 +1,354 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>北平风物记 | 关于我们</title>
+    <link href="https://fonts.googleapis.com/css2?family=Ma+Shan+Zheng&family=Noto+Serif+SC:wght@300;400;700&display=swap" rel="stylesheet">
+    <style>
+        /* --- 新增：沉浸式白噪音按钮 --- */
+.audio-wrapper {
+    margin-top: 15px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+.ambient-btn {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    padding: 8px 20px;
+    background: rgba(255, 255, 255, 0.6);
+    border: 1px solid var(--c-gray);
+    border-radius: 50px;
+    cursor: pointer;
+    font-family: var(--f-body);
+    font-size: 0.9rem;
+    color: var(--c-ink);
+    transition: all 0.3s ease;
+    backdrop-filter: blur(5px);
+}
+
+.ambient-btn:hover {
+    background: #fff;
+    border-color: var(--c-red);
+    color: var(--c-red);
+    transform: translateY(-2px);
+    box-shadow: 0 5px 15px rgba(0,0,0,0.05);
+}
+
+/* 播放状态 */
+.ambient-btn.playing {
+    background: var(--c-ink);
+    border-color: var(--c-ink);
+    color: var(--c-paper);
+}
+
+.ambient-btn.playing:hover {
+    background: var(--c-red);
+    border-color: var(--c-red);
+}
+
+/* 简单的声波动画图标 */
+.sound-wave {
+    display: flex;
+    align-items: center;
+    gap: 3px;
+    height: 12px;
+}
+
+.bar {
+    width: 2px;
+    height: 100%;
+    background-color: currentColor;
+    animation: none;
+}
+
+.ambient-btn.playing .bar {
+    animation: wave 1s infinite ease-in-out;
+}
+
+.ambient-btn.playing .bar:nth-child(1) { animation-delay: 0.0s; }
+.ambient-btn.playing .bar:nth-child(2) { animation-delay: 0.2s; }
+.ambient-btn.playing .bar:nth-child(3) { animation-delay: 0.4s; }
+.ambient-btn.playing .bar:nth-child(4) { animation-delay: 0.1s; }
+
+@keyframes wave {
+    0%, 100% { height: 20%; }
+    50% { height: 100%; }
+}
+        :root {
+            --c-red: #8E354A;       /* 宫墙红 */
+            --c-ink: #2C2C2C;       /* 徽墨 */
+            --c-gray: #5e616d;      /* 瓦灰 */
+            --c-paper: #F3F1E8;     /* 宣纸白 */
+            --c-gold: #B59868;      /* 鎏金 */
+            
+            --f-title: 'Ma Shan Zheng', cursive;
+            --f-body: 'Noto Serif SC', serif;
+            
+            --nav-height: 80px;
+        }
+
+        * { box-sizing: border-box; margin: 0; padding: 0; }
+        
+        body {
+            background-color: var(--c-paper);
+            color: var(--c-ink);
+            font-family: var(--f-body);
+            overflow-x: hidden;
+            /* 纸张纹理 */
+            background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noiseFilter'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.65' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noiseFilter)' opacity='0.05'/%3E%3C/svg%3E");
+        }
+
+        /* --- 【核心修改】单独设立的图片类 --- */
+        .project-img {
+            width: 100%;
+            height: 500px;          /* 统一高度，保持整齐 */
+            object-fit: cover;      /* 智能裁剪，防止变形 */
+            border-radius: 4px;     /* 微圆角 */
+            box-shadow: 20px 20px 0px rgba(0,0,0,0.05); /* 新中式阴影 */
+            transition: transform 0.8s ease, filter 0.5s ease;
+            filter: sepia(0.1);     /* 轻微复古滤镜 */
+        }
+
+        /* 鼠标悬停时的图片动效 */
+        .article-block:hover .project-img {
+            transform: scale(1.02);
+            filter: sepia(0);
+        }
+
+        /* --- 0. 开场动画 --- */
+        #intro-overlay {
+            position: fixed; inset: 0; z-index: 9999;
+            background: var(--c-ink); color: var(--c-paper);
+            display: flex; flex-direction: column; align-items: center; justify-content: center;
+            transition: opacity 1s ease, visibility 1s;
+        }
+        .intro-text { font-family: var(--f-title); font-size: 3.5rem; writing-mode: vertical-rl; letter-spacing: 0.5rem; margin-bottom: 40px; }
+        .btn-enter { padding: 12px 40px; border: 1px solid var(--c-paper); background: transparent; color: var(--c-paper); cursor: pointer; font-family: var(--f-body); letter-spacing: 2px; transition: 0.4s; font-size: 1.1rem; }
+        .btn-enter:hover { background: var(--c-paper); color: var(--c-ink); box-shadow: 0 0 20px rgba(255,255,255,0.3); }
+
+        /* --- 1. 导航栏 --- */
+        nav {
+            position: fixed; top: 0; width: 100%; height: var(--nav-height);
+            background: rgba(243, 241, 232, 0.95); backdrop-filter: blur(10px);
+            border-bottom: 1px solid rgba(0,0,0,0.05); z-index: 1000;
+            display: flex; justify-content: space-between; align-items: center;
+            padding: 0 40px; transition: all 0.3s;
+        }
+        .logo { font-family: var(--f-title); font-size: 2rem; color: var(--c-red); text-decoration: none; }
+        .menu { display: flex; gap: 40px; height: 100%; align-items: center; }
+        .menu-item { position: relative; height: 100%; display: flex; align-items: center; cursor: pointer; font-size: 1rem; color: var(--c-ink); text-decoration: none; transition: 0.3s; }
+        .menu-item:hover { color: var(--c-red); }
+        
+        /* 二级菜单 */
+        .dropdown {
+            position: absolute; top: var(--nav-height); left: 50%; transform: translateX(-50%);
+            background: #fff; box-shadow: 0 10px 30px rgba(0,0,0,0.1);
+            padding: 20px 0; min-width: 180px; opacity: 0; visibility: hidden;
+            transition: all 0.3s ease; border-top: 3px solid var(--c-red);
+        }
+        .menu-item:hover .dropdown { opacity: 1; visibility: visible; top: var(--nav-height); }
+        .dropdown a { display: block; padding: 12px 30px; color: #666; text-decoration: none; font-size: 0.95rem; transition: 0.2s; white-space: nowrap; }
+        .dropdown a:hover { background: var(--c-paper); color: var(--c-red); padding-left: 35px; }
+
+        /* --- 新增：关于我们 / 品牌理念板块 --- */
+#about {
+    padding: 120px 0;
+    background: rgba(255, 255, 255, 0.4); /* 轻微透白，区别于背景 */
+    position: relative;
+    border-top: 1px solid rgba(0,0,0,0.05);
+    border-bottom: 1px solid rgba(0,0,0,0.05);
+}
+
+.about-container {
+    max-width: 1000px;
+    margin: 0 auto;
+    padding: 0 40px;
+}
+
+.about-header {
+    text-align: center;
+    margin-bottom: 60px;
+}
+
+.about-header h2 {
+    font-family: var(--f-title);
+    font-size: 3rem;
+    color: var(--c-ink);
+    margin-bottom: 15px;
+}
+
+.about-header .sub-title {
+    color: var(--c-red);
+    letter-spacing: 4px;
+    font-size: 0.9rem;
+    text-transform: uppercase;
+}
+
+.concept-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 60px;
+}
+
+.concept-card {
+    padding: 40px;
+    background: #fff;
+    border: 1px solid rgba(0,0,0,0.05);
+    box-shadow: 10px 10px 30px rgba(0,0,0,0.03);
+    border-radius: 4px;
+    transition: transform 0.3s ease;
+    position: relative;
+    overflow: hidden;
+}
+
+.concept-card:hover {
+    transform: translateY(-5px);
+    box-shadow: 15px 15px 40px rgba(0,0,0,0.06);
+}
+
+/* 装饰性边框，增加中式韵味 */
+.concept-card::before {
+    content: '';
+    position: absolute;
+    top: 0; left: 0; width: 100%; height: 4px;
+    background: var(--c-gold);
+    opacity: 0.5;
+}
+
+.concept-title {
+    font-size: 1.4rem;
+    color: var(--c-ink);
+    margin-bottom: 25px;
+    font-weight: bold;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
+
+.concept-title span {
+    color: var(--c-red);
+    font-family: var(--f-title);
+    font-size: 1.8rem;
+}
+
+.concept-text {
+    line-height: 1.8;
+    color: #555;
+    font-size: 1rem;
+    text-align: justify;
+}
+
+.highlight-box {
+    margin-top: 20px;
+    padding: 15px;
+    background: var(--c-paper);
+    border-left: 3px solid var(--c-red);
+    font-size: 0.9rem;
+    color: var(--c-gray);
+    font-style: italic;
+}
+
+@media (max-width: 768px) {
+    .concept-grid { grid-template-columns: 1fr; }
+    .about-header h2 { font-size: 2.5rem; }
+}
+
+        /* Footer */
+        footer { background: var(--c-ink); color: #888; padding: 80px 0; text-align: center; }
+        .share-btn { padding: 15px 50px; background: transparent; border: 1px solid #666; color: #fff; font-size: 1rem; cursor: pointer; transition: 0.3s; }
+        .share-btn:hover { background: var(--c-gold); border-color: var(--c-gold); color: #000; }
+
+        /* 动画 */
+        @keyframes pulse { 0% { opacity: 0.8; transform: scale(1); } 100% { opacity: 0; transform: scale(3); } }
+        .reveal { opacity: 0; transform: translateY(30px); transition: all 0.8s ease; }
+        .reveal.active { opacity: 1; transform: translateY(0); }
+
+        @media (max-width: 768px) {
+            .hero-title { font-size: 3rem; }
+            .article-block, .article-block.reverse { grid-template-columns: 1fr; direction: ltr; }
+            .project-img { height: 300px; }
+            .menu { display: none; }
+        }
+    </style>
+</head>
+<body>
+
+    <nav>
+        <a href="index.html" class="logo">
+            <img src="image/logo.png" alt="北平风物记" style="width: 40px; height: 40px; object-fit: contain;">
+            <span style="margin-left: 10px; font-family: var(--f-title); font-size: 1.5rem; color: var(--c-red);">北平风物记</span>
+        </a>
+        <div class="menu">
+            <a href="index.html" class="menu-item">首页</a>
+            <a href="map.html" class="menu-item">漫游地图</a>
+            <div class="menu-item">
+                路线策展
+                <div class="dropdown">
+                    <a href="literature-route.html">文学与光阴</a>
+                    <a href="jiangnan-route.html">北平江南</a>
+                    <a href="ditan-route.html">与地坛同呼吸</a>
+                </div>
+            </div>
+            <a href="about.html" class="menu-item">关于我们</a>
+        </div>
+    </nav>
+
+    <section id="about">
+        <div class="about-container reveal">
+            <div class="about-header">
+                <span class="sub-title">VISION & PHILOSOPHY</span>
+                <h2>策展理念</h2>
+                <div style="width: 50px; height: 3px; background: var(--c-red); margin: 20px auto;"></div>
+            </div>
+
+            <div class="concept-grid">
+                <div class="concept-card">
+                    <div class="concept-title">
+                        <span>01.</span> 数字策展
+                    </div>
+                    <div class="concept-text">
+                        <p>我们并非传统的旅游指南，而是北京城市文化的<strong>“数字策展人”</strong>。</p>
+                        <p style="margin-top: 15px;">在这座拥有三千年历史的古都中，由于过度开发与快节奏生活，许多深刻的文化纹理正逐渐隐没。北平风物记致力于挖掘这些被折叠的城市记忆，通过影像、声音与交互叙事，为 <strong>Z世代</strong> 人群提供有深度、有审美、可探索的<strong>“微型城市冒险”</strong>。</p>
+                        <div class="highlight-box">
+                            “将整座城市视为一座没有围墙的博物馆，每一次点击，都是一次对历史的除尘。”
+                        </div>
+                    </div>
+                </div>
+
+                <div class="concept-card">
+                    <div class="concept-title">
+                        <span>02.</span> 漫步文化
+                    </div>
+                    <div class="concept-text">
+                        <p><strong>City Walk (城市漫步)</strong> 不是特种兵式的打卡，也不是漫无目的的游荡。它是一种反抗算法推荐、回归具体感知的在地旅行方式。</p>
+                        <p style="margin-top: 15px;">我们主张“慢下来”，深入城市的毛细血管——胡同、古塔阴影或废弃的工业遗迹。用脚步丈量街道的尺度，用感官捕捉季节的流转。在这里，你不再是游客，而是一个观察者、一个阅读者。</p>
+                        <div class="highlight-box">
+                            “在倍速播放的时代，漫步是我们夺回生活节奏的最小单位抵抗。”
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <footer id="footer">
+        <h3>北平风物记</h3>
+        <p style="margin-bottom: 30px;">一座城市的记忆重构</p>
+        <p style="margin-top: 60px; font-size: 0.8rem; opacity: 0.5;">&copy; 2026 北平风物记</p>
+    </footer>
+
+    <script>
+        // 滚动显现
+        const observer = new IntersectionObserver((entries) => {
+            entries.forEach(entry => {
+                if (entry.isIntersecting) entry.target.classList.add('active');
+            });
+        }, { threshold: 0.1 });
+        document.querySelectorAll('.reveal').forEach(el => observer.observe(el));
+    </script>
+</body>
+</html>

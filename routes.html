@@ -1,0 +1,1826 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>路线策展 - 北平风物记</title>
+    <link href="https://fonts.googleapis.com/css2?family=Ma+Shan+Zheng&family=Noto+Serif+SC:wght@300;400;700&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --c-red: #8E354A;       /* 宫墙红 */
+            --c-ink: #2C2C2C;       /* 徽墨 */
+            --c-gray: #5e616d;      /* 瓦灰 */
+            --c-paper: #F3F1E8;     /* 宣纸白 */
+            --c-gold: #B59868;      /* 鎏金 */
+            
+            --f-title: 'Ma Shan Zheng', cursive;
+            --f-body: 'Noto Serif SC', serif;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            background-color: var(--c-paper);
+            color: var(--c-ink);
+            font-family: var(--f-body);
+            line-height: 1.6;
+            overflow-x: hidden;
+            /* 纸张纹理 */
+            background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noiseFilter'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.65' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noiseFilter)' opacity='0.05'/%3E%3C/svg%3E");
+        }
+
+        /* 导航栏 */
+        nav {
+            position: fixed;
+            top: 0;
+            width: 100%;
+            background: rgba(243, 241, 232, 0.95);
+            backdrop-filter: blur(10px);
+            border-bottom: 1px solid rgba(0,0,0,0.05);
+            z-index: 1000;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 0 40px;
+            height: 80px;
+        }
+
+        .logo {
+            font-family: var(--f-title);
+            font-size: 2rem;
+            color: var(--c-red);
+            text-decoration: none;
+        }
+
+        .menu {
+            display: flex;
+            gap: 40px;
+            height: 100%;
+            align-items: center;
+        }
+
+        .menu-item {
+            position: relative;
+            height: 100%;
+            display: flex;
+            align-items: center;
+            cursor: pointer;
+            font-size: 1rem;
+            color: var(--c-ink);
+            text-decoration: none;
+            transition: 0.3s;
+        }
+
+        .menu-item:hover {
+            color: var(--c-red);
+        }
+
+        /* 二级菜单 */
+        .dropdown {
+            position: absolute;
+            top: 80px;
+            left: 50%;
+            transform: translateX(-50%);
+            background: #fff;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.1);
+            padding: 20px 0;
+            min-width: 180px;
+            opacity: 0;
+            visibility: hidden;
+            transition: all 0.3s ease;
+            border-top: 3px solid var(--c-red);
+        }
+
+        .menu-item:hover .dropdown {
+            opacity: 1;
+            visibility: visible;
+        }
+
+        .dropdown a {
+            display: block;
+            padding: 12px 30px;
+            color: #666;
+            text-decoration: none;
+            font-size: 0.95rem;
+            transition: 0.2s;
+            white-space: nowrap;
+        }
+
+        .dropdown a:hover {
+            background: var(--c-paper);
+            color: var(--c-red);
+            padding-left: 35px;
+        }
+
+        /* 主容器 */
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 0 20px;
+        }
+
+        /* 路线策展页面 */
+        .routes-section {
+            padding: 120px 0 80px;
+            text-align: center;
+        }
+        
+        /* 城市记忆交互 */
+        .city-memory {
+            display: block;
+        }
+        
+        .route-details-section {
+            display: none;
+            margin-top: 60px;
+        }
+        
+        .route-details-section.active {
+            display: block;
+        }
+        
+        .back-btn {
+            display: inline-block;
+            background: var(--c-paper);
+            color: var(--c-ink);
+            padding: 10px 25px;
+            border-radius: 4px;
+            text-decoration: none;
+            transition: all 0.3s ease;
+            margin-bottom: 30px;
+            border: 1px solid #e0ded6;
+        }
+        
+        .back-btn:hover {
+            background: var(--c-gray);
+            color: white;
+        }
+        
+        /* 记忆卡片悬停效果增强 */
+        .memory-item {
+            transition: all 0.3s ease;
+        }
+        
+        .memory-item:hover {
+            transform: translateY(-10px) scale(1.02);
+            box-shadow: 0 20px 40px rgba(0,0,0,0.15);
+        }
+        
+        /* 集章游戏样式 */
+        .stamp-section {
+            margin: 80px 0;
+            padding: 60px 0;
+            background: var(--c-paper);
+        }
+        
+        .stamp-title {
+            font-family: var(--f-title);
+            font-size: 2.5rem;
+            color: var(--c-red);
+            margin-bottom: 40px;
+            text-align: center;
+        }
+        
+        .stamps-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+            gap: 30px;
+            max-width: 800px;
+            margin: 0 auto;
+        }
+        
+        .stamp-item {
+            text-align: center;
+            padding: 20px;
+            background: white;
+            border-radius: 8px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.05);
+            transition: all 0.3s ease;
+        }
+        
+        .stamp-item:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 15px 35px rgba(0,0,0,0.1);
+        }
+        
+        .stamp-image {
+            width: 100px;
+            height: 100px;
+            margin: 0 auto 15px;
+            background: #f0f0f0;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 3rem;
+            color: #ccc;
+            transition: all 0.3s ease;
+        }
+        
+        .stamp-item.collected .stamp-image {
+            background: linear-gradient(135deg, var(--c-red), var(--c-gold));
+            color: white;
+            transform: scale(1.1);
+            box-shadow: 0 8px 25px rgba(142, 53, 74, 0.3);
+        }
+        
+        .stamp-name {
+            font-size: 1rem;
+            color: var(--c-ink);
+            margin-bottom: 5px;
+        }
+        
+        .stamp-status {
+            font-size: 0.9rem;
+            color: var(--c-gray);
+        }
+        
+        .stamp-item.collected .stamp-status {
+            color: var(--c-red);
+            font-weight: bold;
+        }
+        
+        .stamp-progress {
+            text-align: center;
+            margin: 40px 0;
+            font-size: 1.2rem;
+            color: var(--c-ink);
+        }
+        
+        .progress-bar {
+            width: 80%;
+            max-width: 600px;
+            height: 20px;
+            background: #e0ded6;
+            border-radius: 10px;
+            margin: 20px auto;
+            overflow: hidden;
+        }
+        
+        .progress-fill {
+            height: 100%;
+            background: linear-gradient(90deg, var(--c-red), var(--c-gold));
+            width: 0%;
+            transition: width 0.5s ease;
+            border-radius: 10px;
+        }
+        
+        .collect-all-btn {
+            display: inline-block;
+            background: var(--c-red);
+            color: white;
+            padding: 12px 40px;
+            border-radius: 4px;
+            text-decoration: none;
+            transition: all 0.3s ease;
+            margin-top: 20px;
+            border: none;
+            font-family: var(--f-body);
+            font-size: 1rem;
+            cursor: pointer;
+        }
+        
+        .collect-all-btn:hover {
+            background: var(--c-gold);
+            transform: translateY(-2px);
+        }
+        
+        /* AI语音导游样式 */
+        .voice-guide {
+            margin: 40px 0;
+            padding: 30px;
+            background: var(--c-paper);
+            border-radius: 8px;
+            border: 1px solid #e0ded6;
+        }
+        
+        .voice-guide-title {
+            font-size: 1.2rem;
+            color: var(--c-ink);
+            margin-bottom: 20px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+        
+        .voice-controls {
+            display: flex;
+            gap: 15px;
+            align-items: center;
+            flex-wrap: wrap;
+        }
+        
+        .voice-btn {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            padding: 10px 20px;
+            background: white;
+            border: 1px solid #e0ded6;
+            border-radius: 50px;
+            cursor: pointer;
+            font-family: var(--f-body);
+            font-size: 0.9rem;
+            color: var(--c-ink);
+            transition: all 0.3s ease;
+        }
+        
+        .voice-btn:hover {
+            background: var(--c-red);
+            color: white;
+            border-color: var(--c-red);
+        }
+        
+        .voice-btn.active {
+            background: var(--c-red);
+            color: white;
+            border-color: var(--c-red);
+        }
+        
+        .voice-slider {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+        
+        .voice-slider label {
+            font-size: 0.9rem;
+            color: var(--c-gray);
+        }
+        
+        .voice-slider input[type="range"] {
+            width: 150px;
+            accent-color: var(--c-red);
+        }
+        
+        .voice-status {
+            margin-top: 15px;
+            font-size: 0.9rem;
+            color: var(--c-gray);
+        }
+        
+        /* 语音播放动画 */
+        .voice-wave {
+            display: flex;
+            align-items: center;
+            gap: 3px;
+            height: 12px;
+        }
+        
+        .voice-bar {
+            width: 2px;
+            height: 100%;
+            background-color: currentColor;
+            animation: none;
+        }
+        
+        .voice-btn.playing .voice-bar {
+            animation: voiceWave 1s infinite ease-in-out;
+        }
+        
+        .voice-btn.playing .voice-bar:nth-child(2) {
+            animation-delay: 0.2s;
+        }
+        
+        .voice-btn.playing .voice-bar:nth-child(3) {
+            animation-delay: 0.4s;
+        }
+        
+        .voice-btn.playing .voice-bar:nth-child(4) {
+            animation-delay: 0.1s;
+        }
+        
+        @keyframes voiceWave {
+            0%, 100% { height: 20%; }
+            50% { height: 100%; }
+        }
+        
+        /* 虚拟漫游样式 */
+        .virtual-tour {
+            margin: 40px 0;
+            padding: 30px;
+            background: var(--c-paper);
+            border-radius: 8px;
+            border: 1px solid #e0ded6;
+        }
+        
+        .virtual-tour-title {
+            font-size: 1.2rem;
+            color: var(--c-ink);
+            margin-bottom: 20px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+        
+        .panorama-container {
+            position: relative;
+            width: 100%;
+            height: 400px;
+            background: #f0f0f0;
+            border-radius: 8px;
+            overflow: hidden;
+            cursor: grab;
+        }
+        
+        .panorama-container:active {
+            cursor: grabbing;
+        }
+        
+        .panorama-image {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 200%; /* 2倍宽度实现全景效果 */
+            height: 100%;
+            background-size: cover;
+            background-position: center;
+            transition: transform 0.1s ease;
+        }
+        
+        .panorama-controls {
+            position: absolute;
+            bottom: 20px;
+            left: 50%;
+            transform: translateX(-50%);
+            display: flex;
+            gap: 15px;
+            background: rgba(0, 0, 0, 0.6);
+            padding: 10px 20px;
+            border-radius: 30px;
+            z-index: 10;
+        }
+        
+        .panorama-btn {
+            background: white;
+            border: none;
+            border-radius: 50%;
+            width: 40px;
+            height: 40px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+        
+        .panorama-btn:hover {
+            background: var(--c-red);
+            color: white;
+            transform: scale(1.1);
+        }
+        
+        .hotspot {
+            position: absolute;
+            width: 20px;
+            height: 20px;
+            background: var(--c-red);
+            border: 3px solid white;
+            border-radius: 50%;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            z-index: 5;
+            animation: pulse 2s infinite;
+        }
+        
+        .hotspot:hover {
+            transform: scale(1.3);
+            box-shadow: 0 0 20px var(--c-red);
+        }
+        
+        .hotspot::after {
+            content: attr(data-label);
+            position: absolute;
+            bottom: 100%;
+            left: 50%;
+            transform: translateX(-50%);
+            background: rgba(0, 0, 0, 0.8);
+            color: white;
+            padding: 5px 10px;
+            border-radius: 4px;
+            font-size: 0.8rem;
+            white-space: nowrap;
+            opacity: 0;
+            visibility: hidden;
+            transition: all 0.3s ease;
+            margin-bottom: 5px;
+        }
+        
+        .hotspot:hover::after {
+            opacity: 1;
+            visibility: visible;
+        }
+        
+        .hotspot-info {
+            position: absolute;
+            top: 20px;
+            right: 20px;
+            background: rgba(255, 255, 255, 0.9);
+            padding: 20px;
+            border-radius: 8px;
+            max-width: 300px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
+            z-index: 15;
+            display: none;
+        }
+        
+        .hotspot-info.active {
+            display: block;
+        }
+        
+        .hotspot-info h4 {
+            color: var(--c-red);
+            margin-bottom: 10px;
+            font-size: 1.1rem;
+        }
+        
+        .hotspot-info p {
+            color: var(--c-ink);
+            font-size: 0.9rem;
+            line-height: 1.6;
+        }
+        
+        @keyframes pulse {
+            0% {
+                box-shadow: 0 0 0 0 rgba(142, 53, 74, 0.7);
+            }
+            70% {
+                box-shadow: 0 0 0 10px rgba(142, 53, 74, 0);
+            }
+            100% {
+                box-shadow: 0 0 0 0 rgba(142, 53, 74, 0);
+            }
+        }
+
+        .section-title {
+            font-family: var(--f-title);
+            font-size: 3rem;
+            color: var(--c-red);
+            margin-bottom: 20px;
+            text-align: center;
+        }
+
+        .section-subtitle {
+            font-size: 1.2rem;
+            color: var(--c-gray);
+            margin-bottom: 60px;
+            text-align: center;
+        }
+
+        /* 路线网格 */
+        .routes-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(350px, 1fr));
+            gap: 40px;
+            margin-top: 60px;
+        }
+
+        /* 路线卡片 */
+        .route-card {
+            background: #fff;
+            border-radius: 8px;
+            overflow: hidden;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.05);
+            transition: all 0.3s ease;
+            cursor: pointer;
+            position: relative;
+        }
+
+        .route-card:hover {
+            transform: translateY(-10px);
+            box-shadow: 0 20px 40px rgba(0,0,0,0.1);
+        }
+
+        /* 路线图片 */
+        .route-image {
+            height: 250px;
+            background-size: cover;
+            background-position: center;
+            position: relative;
+            overflow: hidden;
+        }
+
+        /* 使用本地图片 */
+        #literature-route .route-image {
+            background-image: url('image/wansongta.png');
+        }
+
+        #jiangnan-route .route-image {
+            background-image: url('image/jiangnan-bamboo-01.jpg');
+        }
+
+        #ditan-route .route-image {
+            background-image: url('image/ditan-courtyard-03.jpg');
+        }
+
+        /* 路线编号 */
+        .route-number {
+            position: absolute;
+            top: 20px;
+            left: 20px;
+            background: var(--c-red);
+            color: white;
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: bold;
+            font-size: 1.2rem;
+        }
+
+        /* 路线内容 */
+        .route-content {
+            padding: 30px;
+        }
+
+        .route-title {
+            font-size: 1.8rem;
+            color: var(--c-ink);
+            margin-bottom: 10px;
+            font-weight: bold;
+        }
+
+        .route-subtitle {
+            font-size: 1rem;
+            color: var(--c-gray);
+            margin-bottom: 20px;
+        }
+
+        .route-duration {
+            display: inline-block;
+            background: var(--c-gold);
+            color: white;
+            padding: 5px 15px;
+            border-radius: 20px;
+            font-size: 0.9rem;
+            margin-bottom: 20px;
+        }
+
+        .route-description {
+            color: #666;
+            margin-bottom: 25px;
+            line-height: 1.7;
+        }
+
+        .route-highlights {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 10px;
+            margin-bottom: 25px;
+        }
+
+        .highlight-tag {
+            background: var(--c-paper);
+            color: var(--c-ink);
+            padding: 5px 12px;
+            border-radius: 15px;
+            font-size: 0.85rem;
+            border: 1px solid #e0ded6;
+        }
+
+        /* 查看按钮 */
+        .view-btn {
+            display: inline-block;
+            background: var(--c-red);
+            color: white;
+            padding: 12px 30px;
+            border-radius: 4px;
+            text-decoration: none;
+            transition: all 0.3s ease;
+            font-weight: bold;
+        }
+
+        .view-btn:hover {
+            background: #732a3c;
+            transform: translateY(-2px);
+        }
+
+        /* 响应式设计 */
+        @media (max-width: 768px) {
+            nav {
+                padding: 0 20px;
+            }
+
+            .menu {
+                display: none;
+            }
+
+            .routes-grid {
+                grid-template-columns: 1fr;
+                gap: 30px;
+            }
+
+            .section-title {
+                font-size: 2.5rem;
+            }
+        }
+
+        /* Footer */
+        footer {
+            background: var(--c-ink);
+            color: #888;
+            padding: 60px 0;
+            text-align: center;
+            margin-top: 80px;
+        }
+
+        .footer-content {
+            max-width: 800px;
+            margin: 0 auto;
+        }
+
+        .footer-title {
+            font-family: var(--f-title);
+            color: var(--c-paper);
+            font-size: 2rem;
+            margin-bottom: 20px;
+        }
+
+        .footer-description {
+            margin-bottom: 40px;
+            line-height: 1.6;
+        }
+
+        .share-btn {
+            padding: 15px 50px;
+            background: transparent;
+            border: 1px solid #666;
+            color: #fff;
+            font-size: 1rem;
+            cursor: pointer;
+            transition: 0.3s;
+        }
+
+        .share-btn:hover {
+            background: var(--c-gold);
+            border-color: var(--c-gold);
+            color: #000;
+        }
+
+        .copyright {
+            margin-top: 40px;
+            font-size: 0.8rem;
+            opacity: 0.5;
+        }
+    </style>
+</head>
+<body>
+    <nav>
+        <a href="index.html" class="logo">
+            <img src="image/logo.png" alt="北平风物记" style="width: 40px; height: 40px; object-fit: contain;">
+            <span style="margin-left: 10px; font-family: var(--f-title); font-size: 1.5rem; color: var(--c-red);">北平风物记</span>
+        </a>
+        <div class="menu">
+            <a href="index.html" class="menu-item">首页</a>
+            <a href="map.html" class="menu-item">漫游地图</a>
+            <div class="menu-item">
+                路线策展
+                <div class="dropdown">
+                    <a href="literature-route.html">文学与光阴</a>
+                    <a href="jiangnan-route.html">北平江南</a>
+                    <a href="ditan-route.html">与地坛同呼吸</a>
+                </div>
+            </div>
+            <a href="about.html" class="menu-item">关于我们</a>
+        </div>
+    </nav>
+
+    <section class="routes-section">
+        <div class="container">
+            <h2 class="section-title">路线策展</h2>
+            <p class="section-subtitle">探索北平的文化脉络，感受历史与现代的交融</p>
+            
+            <!-- 城市记忆板块 -->
+            <section class="city-memory" style="padding: 60px 0; background: var(--c-paper); text-align: center;">
+                <h2 style="font-family: var(--f-title); font-size: 3rem; color: var(--c-red); margin-bottom: 40px;">城市记忆</h2>
+                <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 30px; margin-bottom: 60px;">
+                    <div class="memory-item" style="cursor: pointer; transition: transform 0.3s ease; background: white; padding: 20px; border-radius: 8px; box-shadow: 0 10px 30px rgba(0,0,0,0.05);">
+                        <img src="image/wansongta.png" alt="万松老人塔" style="width: 100%; height: 200px; object-fit: cover; border-radius: 4px; margin-bottom: 20px;">
+                        <h3 style="font-size: 1.4rem; color: var(--c-ink); margin-bottom: 10px;">文学与光阴的交错</h3>
+                        <p style="color: var(--c-gray); line-height: 1.6;">从古塔到藏书楼的北平三重时间，探索北京的文学与历史记忆，感受时间的流转与文明的传承。</p>
+                    </div>
+                    <div class="memory-item" style="cursor: pointer; transition: transform 0.3s ease; background: white; padding: 20px; border-radius: 8px; box-shadow: 0 10px 30px rgba(0,0,0,0.05);">
+                        <img src="image/jiangnan-bamboo-01.jpg" alt="北平江南" style="width: 100%; height: 200px; object-fit: cover; border-radius: 4px; margin-bottom: 20px;">
+                        <h3 style="font-size: 1.4rem; color: var(--c-ink); margin-bottom: 10px;">北京的江南烟雨</h3>
+                        <p style="color: var(--c-gray); line-height: 1.6;">体验北方的江南水乡风情，在紫竹院中感受皇家园林的南渡梦影，探索友贤山馆、翠池等景点。</p>
+                    </div>
+                    <div class="memory-item" style="cursor: pointer; transition: transform 0.3s ease; background: white; padding: 20px; border-radius: 8px; box-shadow: 0 10px 30px rgba(0,0,0,0.05);">
+                        <img src="image/ditan-courtyard-03.jpg" alt="与地坛同呼吸" style="width: 100%; height: 200px; object-fit: cover; border-radius: 4px; margin-bottom: 20px;">
+                        <h3 style="font-size: 1.4rem; color: var(--c-ink); margin-bottom: 10px;">与地坛同呼吸</h3>
+                        <p style="color: var(--c-gray); line-height: 1.6;">跟随史铁生的脚步探索地坛的文学与生命意义，在寂静中听见生命的回响，感受生命的沉思与力量。</p>
+                    </div>
+                </div>
+            </section>
+            
+            <!-- 集章游戏板块 -->
+            <section class="stamp-section">
+                <div class="container">
+                    <h2 class="stamp-title">城市记忆集章</h2>
+                    <div class="stamp-progress">
+                        <p>已收集 <span id="stamp-count">0</span>/5 个印章</p>
+                        <div class="progress-bar">
+                            <div class="progress-fill" id="progress-fill"></div>
+                        </div>
+                    </div>
+                    
+                    <div class="stamps-grid">
+                        <!-- 印章1：文学与光阴 -->
+                        <div class="stamp-item" data-stamp="literature">
+                            <div class="stamp-image">📜</div>
+                            <h3 class="stamp-name">文学与光阴</h3>
+                            <p class="stamp-status">未收集</p>
+                        </div>
+                        
+                        <!-- 印章2：江南烟雨 -->
+                        <div class="stamp-item" data-stamp="jiangnan">
+                            <div class="stamp-image">🌧️</div>
+                            <h3 class="stamp-name">江南烟雨</h3>
+                            <p class="stamp-status">未收集</p>
+                        </div>
+                        
+                        <!-- 印章3：与地坛同呼吸 -->
+                        <div class="stamp-item" data-stamp="ditan">
+                            <div class="stamp-image">🌳</div>
+                            <h3 class="stamp-name">与地坛同呼吸</h3>
+                            <p class="stamp-status">未收集</p>
+                        </div>
+                        
+                        <!-- 印章4：城市探索者 -->
+                        <div class="stamp-item" data-stamp="explorer">
+                            <div class="stamp-image">🧭</div>
+                            <h3 class="stamp-name">城市探索者</h3>
+                            <p class="stamp-status">未收集</p>
+                        </div>
+                        
+                        <!-- 印章5：文化传承者 -->
+                        <div class="stamp-item" data-stamp="heritage">
+                            <div class="stamp-image">🏛️</div>
+                            <h3 class="stamp-name">文化传承者</h3>
+                            <p class="stamp-status">未收集</p>
+                        </div>
+                    </div>
+                    
+                    <div style="text-align: center; margin-top: 40px;">
+                        <button class="collect-all-btn" onclick="collectAllStamps()">一键收集所有印章</button>
+                        <p style="margin-top: 20px; color: var(--c-gray); font-size: 0.9rem;">探索不同路线，收集更多印章吧！</p>
+                    </div>
+                </div>
+            </section>
+
+            <!-- 路线详情区域 -->
+            <!-- 路线1：文学与光阴的交错详情 -->
+            <section class="route-details-section" id="literature-details">
+                <a href="#" class="back-btn" onclick="showCityMemory()">← 返回城市记忆</a>
+                <div class="route-card" style="max-width: 800px; margin: 0 auto;">
+                    <div class="route-image">
+                        <div class="route-number">01</div>
+                    </div>
+                    <div class="route-content">
+                        <h3 class="route-title">文学与光阴的交错</h3>
+                        <p class="route-subtitle">从古塔到藏书楼的北平三重时间</p>
+                        <span class="route-duration">2-3小时</span>
+                        <p class="route-description">探索北京的文学与历史记忆，从万松老人塔到正阳书局，再到红楼藏书楼，感受时间的流转与文明的传承。</p>
+                        <div class="route-highlights">
+                            <span class="highlight-tag">万松老人塔</span>
+                            <span class="highlight-tag">正阳书局</span>
+                            <span class="highlight-tag">红楼藏书楼</span>
+                        </div>
+                        
+                        <!-- AI语音导游 -->
+                        <div class="voice-guide">
+                            <h4 class="voice-guide-title">🤖 AI语音导游</h4>
+                            <div class="voice-controls">
+                                <button class="voice-btn" id="play-btn-literature" onclick="toggleVoiceGuide('literature')">
+                                    <span>▶️</span>
+                                    <span>播放讲解</span>
+                                    <div class="voice-wave">
+                                        <div class="voice-bar"></div>
+                                        <div class="voice-bar"></div>
+                                        <div class="voice-bar"></div>
+                                        <div class="voice-bar"></div>
+                                    </div>
+                                </button>
+                                <button class="voice-btn" onclick="stopVoiceGuide()">
+                                    <span>⏹️</span>
+                                    <span>停止讲解</span>
+                                </button>
+                                <div class="voice-slider">
+                                    <label for="rate-slider">语速:</label>
+                                    <input type="range" id="rate-slider" min="0.5" max="2" step="0.1" value="1">
+                                    <span id="rate-value">1.0</span>
+                                </div>
+                            </div>
+                            <div class="voice-status" id="voice-status-literature">
+                                点击播放按钮，聆听路线讲解
+                            </div>
+                        </div>
+                        
+                        <!-- 虚拟漫游 -->
+                        <div class="virtual-tour">
+                            <h4 class="virtual-tour-title">🗺️ 虚拟漫游</h4>
+                            <div class="panorama-container" id="panorama-literature">
+                                <div class="panorama-image" style="background-image: url('image/wansongta.png')"></div>
+                                
+                                <!-- 热点标记 -->
+                                <div class="hotspot" data-label="万松老人塔" style="top: 40%; left: 30%;" data-info="万松老人塔是一座八角九级密檐塔，已经静立了八百多年，是金元之际禅宗巨匠万松行秀的纪念塔。"></div>
+                                <div class="hotspot" data-label="正阳书局" style="top: 50%; left: 50%;" data-info="正阳书局是北京唯一一家专营北京地方文献的旧书店，在这里你可以找到大量关于北京历史、地理、民俗的书籍。"></div>
+                                <div class="hotspot" data-label="红楼藏书楼" style="top: 60%; left: 70%;" data-info="红楼藏书楼的前身是红楼电影院，2018年转型为公共藏书楼，完美演绎了'旧瓶装新酒'的理念。"></div>
+                                
+                                <!-- 热点信息面板 -->
+                                <div class="hotspot-info" id="hotspot-info">
+                                    <h4 id="hotspot-title"></h4>
+                                    <p id="hotspot-content"></p>
+                                </div>
+                                
+                                <!-- 全景控制按钮 -->
+                                <div class="panorama-controls">
+                                    <button class="panorama-btn" onclick="panoramaMove('literature', -10)" title="向左移动">
+                                        ←
+                                    </button>
+                                    <button class="panorama-btn" onclick="panoramaMove('literature', 10)" title="向右移动">
+                                        →
+                                    </button>
+                                    <button class="panorama-btn" onclick="panoramaZoom('literature', 1.1)" title="放大">
+                                        🔍+
+                                    </button>
+                                    <button class="panorama-btn" onclick="panoramaZoom('literature', 0.9)" title="缩小">
+                                        🔍-
+                                    </button>
+                                    <button class="panorama-btn" onclick="panoramaReset('literature')" title="重置">
+                                        🔄
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <a href="literature-route.html" class="view-btn">进入完整路线</a>
+                    </div>
+                </div>
+            </section>
+            
+            <!-- 路线2：北京的江南烟雨详情 -->
+            <section class="route-details-section" id="jiangnan-details">
+                <a href="#" class="back-btn" onclick="showCityMemory()">← 返回城市记忆</a>
+                <div class="route-card" style="max-width: 800px; margin: 0 auto;">
+                    <div class="route-image">
+                        <div class="route-number">02</div>
+                    </div>
+                    <div class="route-content">
+                        <h3 class="route-title">北京的江南烟雨</h3>
+                        <p class="route-subtitle">一座皇家园林的南渡梦影</p>
+                        <span class="route-duration">3-4小时</span>
+                        <p class="route-description">体验北方的江南水乡风情，在紫竹院中感受皇家园林的南渡梦影，探索友贤山馆、翠池、问月楼等景点。</p>
+                        <div class="route-highlights">
+                            <span class="highlight-tag">友贤山馆</span>
+                            <span class="highlight-tag">翠池</span>
+                            <span class="highlight-tag">问月楼</span>
+                            <span class="highlight-tag">紫御湾码头</span>
+                        </div>
+                        
+                        <!-- AI语音导游 -->
+                        <div class="voice-guide">
+                            <h4 class="voice-guide-title">🤖 AI语音导游</h4>
+                            <div class="voice-controls">
+                                <button class="voice-btn" id="play-btn-jiangnan" onclick="toggleVoiceGuide('jiangnan')">
+                                    <span>▶️</span>
+                                    <span>播放讲解</span>
+                                    <div class="voice-wave">
+                                        <div class="voice-bar"></div>
+                                        <div class="voice-bar"></div>
+                                        <div class="voice-bar"></div>
+                                        <div class="voice-bar"></div>
+                                    </div>
+                                </button>
+                                <button class="voice-btn" onclick="stopVoiceGuide()">
+                                    <span>⏹️</span>
+                                    <span>停止讲解</span>
+                                </button>
+                                <div class="voice-slider">
+                                    <label for="rate-slider">语速:</label>
+                                    <input type="range" id="rate-slider" min="0.5" max="2" step="0.1" value="1">
+                                    <span id="rate-value">1.0</span>
+                                </div>
+                            </div>
+                            <div class="voice-status" id="voice-status-jiangnan">
+                                点击播放按钮，聆听路线讲解
+                            </div>
+                        </div>
+                        
+                        <a href="jiangnan-route.html" class="view-btn">进入完整路线</a>
+                    </div>
+                </div>
+            </section>
+            
+            <!-- 路线3：与地坛同呼吸详情 -->
+            <section class="route-details-section" id="ditan-details">
+                <a href="#" class="back-btn" onclick="showCityMemory()">← 返回城市记忆</a>
+                <div class="route-card" style="max-width: 800px; margin: 0 auto;">
+                    <div class="route-image">
+                        <div class="route-number">03</div>
+                    </div>
+                    <div class="route-content">
+                        <h3 class="route-title">与地坛同呼吸</h3>
+                        <p class="route-subtitle">在寂静中，听见生命的回响</p>
+                        <span class="route-duration">2-3小时</span>
+                        <p class="route-description">跟随史铁生的脚步探索地坛的文学与生命意义，在方泽坛、古柏区、神库等地感受生命的沉思与力量。</p>
+                        <div class="route-highlights">
+                            <span class="highlight-tag">方泽坛</span>
+                            <span class="highlight-tag">古柏区</span>
+                            <span class="highlight-tag">神库</span>
+                            <span class="highlight-tag">我与地坛书店</span>
+                        </div>
+                        
+                        <!-- AI语音导游 -->
+                        <div class="voice-guide">
+                            <h4 class="voice-guide-title">🤖 AI语音导游</h4>
+                            <div class="voice-controls">
+                                <button class="voice-btn" id="play-btn-ditan" onclick="toggleVoiceGuide('ditan')">
+                                    <span>▶️</span>
+                                    <span>播放讲解</span>
+                                    <div class="voice-wave">
+                                        <div class="voice-bar"></div>
+                                        <div class="voice-bar"></div>
+                                        <div class="voice-bar"></div>
+                                        <div class="voice-bar"></div>
+                                    </div>
+                                </button>
+                                <button class="voice-btn" onclick="stopVoiceGuide()">
+                                    <span>⏹️</span>
+                                    <span>停止讲解</span>
+                                </button>
+                                <div class="voice-slider">
+                                    <label for="rate-slider">语速:</label>
+                                    <input type="range" id="rate-slider" min="0.5" max="2" step="0.1" value="1">
+                                    <span id="rate-value">1.0</span>
+                                </div>
+                            </div>
+                            <div class="voice-status" id="voice-status-ditan">
+                                点击播放按钮，聆听路线讲解
+                            </div>
+                        </div>
+                        
+                        <a href="ditan-route.html" class="view-btn">进入完整路线</a>
+                    </div>
+                </div>
+            </section>
+            
+            <!-- JavaScript交互逻辑 -->
+            <script>
+                // 显示路线详情
+                function showRouteDetails(routeId) {
+                    // 隐藏城市记忆
+                    document.querySelector('.city-memory').style.display = 'none';
+                    
+                    // 隐藏集章游戏
+                    document.querySelector('.stamp-section').style.display = 'none';
+                    
+                    // 隐藏所有路线详情
+                    const allDetails = document.querySelectorAll('.route-details-section');
+                    allDetails.forEach(section => {
+                        section.classList.remove('active');
+                    });
+                    
+                    // 显示对应路线详情
+                    const targetDetails = document.getElementById(routeId);
+                    if (targetDetails) {
+                        targetDetails.classList.add('active');
+                    }
+                    
+                    // 根据路线自动收集对应印章
+                    if (routeId === 'literature-details') {
+                        collectStamp('literature');
+                    } else if (routeId === 'jiangnan-details') {
+                        collectStamp('jiangnan');
+                    } else if (routeId === 'ditan-details') {
+                        collectStamp('ditan');
+                    }
+                }
+                
+                // 显示城市记忆
+                function showCityMemory() {
+                    // 显示城市记忆
+                    document.querySelector('.city-memory').style.display = 'block';
+                    
+                    // 显示集章游戏
+                    document.querySelector('.stamp-section').style.display = 'block';
+                    
+                    // 隐藏所有路线详情
+                    const allDetails = document.querySelectorAll('.route-details-section');
+                    allDetails.forEach(section => {
+                        section.classList.remove('active');
+                    });
+                    
+                    // 更新集章进度
+                    updateStampProgress();
+                }
+                
+                // 为城市记忆卡片添加点击事件
+                document.addEventListener('DOMContentLoaded', function() {
+                    // 获取所有城市记忆卡片
+                    const memoryItems = document.querySelectorAll('.memory-item');
+                    
+                    // 为每个卡片添加点击事件
+                    memoryItems.forEach(item => {
+                        item.addEventListener('click', function(e) {
+                            e.preventDefault();
+                            // 根据卡片内容确定要显示的路线详情
+                            if (this.querySelector('h3').textContent.includes('文学与光阴')) {
+                                showRouteDetails('literature-details');
+                            } else if (this.querySelector('h3').textContent.includes('江南烟雨')) {
+                                showRouteDetails('jiangnan-details');
+                            } else if (this.querySelector('h3').textContent.includes('与地坛同呼吸')) {
+                                showRouteDetails('ditan-details');
+                            }
+                        });
+                    });
+                    
+                    // 初始化集章游戏
+                    initStampGame();
+                });
+                
+                // 集章游戏相关函数
+                
+                // 初始化集章游戏
+                function initStampGame() {
+                    // 从localStorage加载集章状态
+                    const stamps = JSON.parse(localStorage.getItem('beipingStamps')) || {};
+                    
+                    // 更新所有印章的显示状态
+                    const stampItems = document.querySelectorAll('.stamp-item');
+                    stampItems.forEach(item => {
+                        const stampId = item.dataset.stamp;
+                        if (stamps[stampId]) {
+                            item.classList.add('collected');
+                            item.querySelector('.stamp-status').textContent = '已收集';
+                        }
+                    });
+                    
+                    // 更新集章进度
+                    updateStampProgress();
+                    
+                    // 如果所有路线都探索过，收集特殊印章
+                    if (stamps.literature && stamps.jiangnan && stamps.ditan) {
+                        collectStamp('explorer');
+                        // 如果收集了所有路线印章，收集文化传承者印章
+                        if (stamps.explorer) {
+                            collectStamp('heritage');
+                        }
+                    }
+                }
+                
+                // 收集单个印章
+                function collectStamp(stampId) {
+                    // 从localStorage加载集章状态
+                    const stamps = JSON.parse(localStorage.getItem('beipingStamps')) || {};
+                    
+                    // 标记印章为已收集
+                    stamps[stampId] = true;
+                    
+                    // 保存到localStorage
+                    localStorage.setItem('beipingStamps', JSON.stringify(stamps));
+                    
+                    // 更新对应印章的显示
+                    const stampItem = document.querySelector(`[data-stamp="${stampId}"]`);
+                    if (stampItem) {
+                        stampItem.classList.add('collected');
+                        stampItem.querySelector('.stamp-status').textContent = '已收集';
+                        
+                        // 添加收集动画效果
+                        stampItem.style.transform = 'scale(1.2)';
+                        setTimeout(() => {
+                            stampItem.style.transform = '';
+                        }, 300);
+                    }
+                    
+                    // 更新集章进度
+                    updateStampProgress();
+                }
+                
+                // 一键收集所有印章
+                function collectAllStamps() {
+                    const stampIds = ['literature', 'jiangnan', 'ditan', 'explorer', 'heritage'];
+                    stampIds.forEach(stampId => {
+                        collectStamp(stampId);
+                    });
+                    
+                    // 显示成功提示
+                    alert('恭喜你收集了所有印章！');
+                }
+                
+                // 更新集章进度
+                function updateStampProgress() {
+                    // 从localStorage加载集章状态
+                    const stamps = JSON.parse(localStorage.getItem('beipingStamps')) || {};
+                    
+                    // 计算已收集印章数量
+                    const collectedCount = Object.values(stamps).filter(Boolean).length;
+                    const totalCount = 5;
+                    
+                    // 更新进度显示
+                    document.getElementById('stamp-count').textContent = collectedCount;
+                    
+                    // 更新进度条
+                    const progressFill = document.getElementById('progress-fill');
+                    const progressPercentage = (collectedCount / totalCount) * 100;
+                    progressFill.style.width = `${progressPercentage}%`;
+                }
+                
+                // AI语音导游相关函数
+                
+                // 路线讲解文本
+                const routeExplanations = {
+                    literature: {
+                        title: "文学与光阴的交错",
+                        content: "欢迎来到文学与光阴的交错路线。这条路线从古塔到藏书楼，展现了北平的三重时间。首先，我们将参观万松老人塔，这座八角九级密檐塔已经静立了八百多年，是金元之际禅宗巨匠万松行秀的纪念塔。接着，我们将前往正阳书局，这是北京唯一一家专营北京地方文献的旧书店，在这里你可以找到大量关于北京历史、地理、民俗的书籍。最后，我们将参观红楼藏书楼，它的前身是红楼电影院，2018年转型为公共藏书楼，完美演绎了'旧瓶装新酒'的理念。"
+                    },
+                    jiangnan: {
+                        title: "北京的江南烟雨",
+                        content: "欢迎来到北京的江南烟雨路线。这条路线位于紫竹院公园，这里仿江南意趣营建，展现了北方的江南水乡风情。首先，我们将参观友贤山馆，这是一座仿江南民居的院落，常设江南书画展。接着，我们将前往翠池，这是全园竹景的精华，也是'烟雨'气质的源泉。然后，我们将登临问月楼，从这里可以俯瞰全园景色。最后，我们将到达紫御湾码头，这里曾是帝后登船的地方，现在是游览长河的起点。"
+                    },
+                    ditan: {
+                        title: "与地坛同呼吸",
+                        content: "欢迎来到与地坛同呼吸路线。这条路线跟随史铁生的脚步，探索地坛的文学与生命意义。首先，我们将参观方泽坛，这是皇帝祭祀'皇地祇'的神圣坛城。接着，我们将前往古柏区，这里的古柏已有三四百年历史，见证了地坛的沧桑变迁。然后，我们将参观神库与祭器库，这里曾存放神牌与礼器。最后，我们将到达钟楼，历史上祭祀前会在此鸣钟。地坛因为史铁生的散文《我与地坛》而成为了一个充满文学气息和生命力量的地方。"
+                    }
+                };
+                
+                // 语音播放相关变量
+                let currentUtterance = null;
+                let isPlaying = false;
+                let currentRoute = null;
+                
+                // 初始化语音合成
+                function initSpeechSynthesis() {
+                    if ('speechSynthesis' in window) {
+                        // 设置默认语音为中文
+                        const voices = window.speechSynthesis.getVoices();
+                        const chineseVoice = voices.find(voice => 
+                            voice.lang.includes('zh') || voice.name.includes('Chinese')
+                        );
+                        if (chineseVoice) {
+                            // 存储默认语音
+                            localStorage.setItem('defaultVoice', chineseVoice.name);
+                        }
+                    }
+                }
+                
+                // 播放语音讲解
+                function toggleVoiceGuide(routeId) {
+                    if (!('speechSynthesis' in window)) {
+                        alert('您的浏览器不支持语音合成功能');
+                        return;
+                    }
+                    
+                    // 如果当前正在播放，停止播放
+                    if (isPlaying) {
+                        stopVoiceGuide();
+                        return;
+                    }
+                    
+                    // 获取路线讲解内容
+                    const explanation = routeExplanations[routeId];
+                    if (!explanation) {
+                        return;
+                    }
+                    
+                    // 保存当前路线
+                    currentRoute = routeId;
+                    
+                    // 创建语音合成对象
+                    const utterance = new SpeechSynthesisUtterance();
+                    utterance.text = explanation.content;
+                    utterance.lang = 'zh-CN';
+                    
+                    // 设置语速
+                    const rate = parseFloat(document.getElementById('rate-slider').value);
+                    utterance.rate = rate;
+                    
+                    // 设置语音
+                    const voices = window.speechSynthesis.getVoices();
+                    const defaultVoiceName = localStorage.getItem('defaultVoice');
+                    const voice = voices.find(v => v.name === defaultVoiceName || v.lang.includes('zh'));
+                    if (voice) {
+                        utterance.voice = voice;
+                    }
+                    
+                    // 语音播放开始事件
+                    utterance.onstart = function() {
+                        isPlaying = true;
+                        // 更新按钮状态
+                        const playBtn = document.getElementById(`play-btn-${routeId}`);
+                        if (playBtn) {
+                            playBtn.classList.add('playing');
+                            playBtn.innerHTML = `
+                                <span>⏸️</span>
+                                <span>暂停讲解</span>
+                                <div class="voice-wave">
+                                    <div class="voice-bar"></div>
+                                    <div class="voice-bar"></div>
+                                    <div class="voice-bar"></div>
+                                    <div class="voice-bar"></div>
+                                </div>
+                            `;
+                        }
+                        // 更新状态信息
+                        const statusElement = document.getElementById(`voice-status-${routeId}`);
+                        if (statusElement) {
+                            statusElement.innerHTML = `<span style="color: var(--c-red);">正在播放讲解...</span>`;
+                        }
+                    };
+                    
+                    // 语音播放结束事件
+                    utterance.onend = function() {
+                        isPlaying = false;
+                        currentUtterance = null;
+                        // 更新按钮状态
+                        const playBtn = document.getElementById(`play-btn-${routeId}`);
+                        if (playBtn) {
+                            playBtn.classList.remove('playing');
+                            playBtn.innerHTML = `
+                                <span>▶️</span>
+                                <span>播放讲解</span>
+                                <div class="voice-wave">
+                                    <div class="voice-bar"></div>
+                                    <div class="voice-bar"></div>
+                                    <div class="voice-bar"></div>
+                                    <div class="voice-bar"></div>
+                                </div>
+                            `;
+                        }
+                        // 更新状态信息
+                        const statusElement = document.getElementById(`voice-status-${routeId}`);
+                        if (statusElement) {
+                            statusElement.innerHTML = '<span style="color: var(--c-gold);">讲解播放结束</span>';
+                        }
+                    };
+                    
+                    // 语音播放错误事件
+                    utterance.onerror = function() {
+                        isPlaying = false;
+                        currentUtterance = null;
+                        // 更新按钮状态
+                        const playBtn = document.getElementById(`play-btn-${routeId}`);
+                        if (playBtn) {
+                            playBtn.classList.remove('playing');
+                            playBtn.innerHTML = `
+                                <span>▶️</span>
+                                <span>播放讲解</span>
+                                <div class="voice-wave">
+                                    <div class="voice-bar"></div>
+                                    <div class="voice-bar"></div>
+                                    <div class="voice-bar"></div>
+                                    <div class="voice-bar"></div>
+                                </div>
+                            `;
+                        }
+                        // 更新状态信息
+                        const statusElement = document.getElementById(`voice-status-${routeId}`);
+                        if (statusElement) {
+                            statusElement.innerHTML = '<span style="color: var(--c-red);">讲解播放失败</span>';
+                        }
+                    };
+                    
+                    // 保存当前语音对象
+                    currentUtterance = utterance;
+                    
+                    // 播放语音
+                    window.speechSynthesis.speak(utterance);
+                }
+                
+                // 停止语音讲解
+                function stopVoiceGuide() {
+                    if ('speechSynthesis' in window) {
+                        window.speechSynthesis.cancel();
+                        isPlaying = false;
+                        currentUtterance = null;
+                        
+                        // 重置所有播放按钮
+                        const playBtns = document.querySelectorAll('[id^="play-btn-"]');
+                        playBtns.forEach(btn => {
+                            btn.classList.remove('playing');
+                            btn.innerHTML = `
+                                <span>▶️</span>
+                                <span>播放讲解</span>
+                                <div class="voice-wave">
+                                    <div class="voice-bar"></div>
+                                    <div class="voice-bar"></div>
+                                    <div class="voice-bar"></div>
+                                    <div class="voice-bar"></div>
+                                </div>
+                            `;
+                        });
+                        
+                        // 重置所有状态信息
+                        const statusElements = document.querySelectorAll('[id^="voice-status-"]');
+                        statusElements.forEach(el => {
+                            el.textContent = '点击播放按钮，聆听路线讲解';
+                        });
+                    }
+                }
+                
+                // 虚拟漫游相关函数
+                
+                // 全景移动函数
+                function panoramaMove(routeId, distance) {
+                    const panoramaContainer = document.getElementById(`panorama-${routeId}`);
+                    if (!panoramaContainer) return;
+                    
+                    const panoramaImage = panoramaContainer.querySelector('.panorama-image');
+                    if (!panoramaImage) return;
+                    
+                    // 获取当前的transform值
+                    const currentTransform = getComputedStyle(panoramaImage).transform;
+                    let translateX = 0;
+                    
+                    // 解析当前的translateX值
+                    if (currentTransform !== 'none') {
+                        const matrix = new DOMMatrix(currentTransform);
+                        translateX = matrix.m41;
+                    }
+                    
+                    // 计算新的translateX值，限制在-50%到0之间
+                    const newTranslateX = Math.max(-500, Math.min(0, translateX + distance));
+                    
+                    // 更新全景图位置
+                    panoramaImage.style.transform = `translateX(${newTranslateX}px)`;
+                }
+                
+                // 全景缩放函数
+                function panoramaZoom(routeId, scaleFactor) {
+                    const panoramaContainer = document.getElementById(`panorama-${routeId}`);
+                    if (!panoramaContainer) return;
+                    
+                    const panoramaImage = panoramaContainer.querySelector('.panorama-image');
+                    if (!panoramaImage) return;
+                    
+                    // 获取当前的transform值
+                    const currentTransform = getComputedStyle(panoramaImage).transform;
+                    let scale = 1;
+                    let translateX = 0;
+                    
+                    // 解析当前的scale值和translateX值
+                    if (currentTransform !== 'none') {
+                        const matrix = new DOMMatrix(currentTransform);
+                        scale = Math.sqrt(matrix.m11 * matrix.m11 + matrix.m12 * matrix.m12);
+                        translateX = matrix.m41;
+                    }
+                    
+                    // 计算新的scale值，限制在1到2之间
+                    const newScale = Math.max(1, Math.min(2, scale * scaleFactor));
+                    
+                    // 更新全景图缩放
+                    panoramaImage.style.transform = `translateX(${translateX}px) scale(${newScale})`;
+                }
+                
+                // 全景重置函数
+                function panoramaReset(routeId) {
+                    const panoramaContainer = document.getElementById(`panorama-${routeId}`);
+                    if (!panoramaContainer) return;
+                    
+                    const panoramaImage = panoramaContainer.querySelector('.panorama-image');
+                    if (!panoramaImage) return;
+                    
+                    // 重置transform
+                    panoramaImage.style.transform = '';
+                }
+                
+                // 初始化虚拟漫游
+                function initPanorama() {
+                    // 为所有热点添加点击事件
+                    const hotspots = document.querySelectorAll('.hotspot');
+                    const hotspotInfo = document.getElementById('hotspot-info');
+                    const hotspotTitle = document.getElementById('hotspot-title');
+                    const hotspotContent = document.getElementById('hotspot-content');
+                    
+                    hotspots.forEach(hotspot => {
+                        hotspot.addEventListener('click', function() {
+                            const label = this.dataset.label;
+                            const info = this.dataset.info;
+                            
+                            // 更新热点信息面板
+                            hotspotTitle.textContent = label;
+                            hotspotContent.textContent = info;
+                            hotspotInfo.classList.add('active');
+                        });
+                    });
+                    
+                    // 点击信息面板外部关闭
+                    document.addEventListener('click', function(e) {
+                        if (!e.target.closest('.hotspot') && !e.target.closest('.hotspot-info')) {
+                            hotspotInfo.classList.remove('active');
+                        }
+                    });
+                    
+                    // 为所有全景容器添加拖拽功能
+                    const panoramaContainers = document.querySelectorAll('.panorama-container');
+                    panoramaContainers.forEach(container => {
+                        let isDragging = false;
+                        let startX = 0;
+                        let translateX = 0;
+                        
+                        container.addEventListener('mousedown', function(e) {
+                            isDragging = true;
+                            startX = e.clientX;
+                            const currentTransform = getComputedStyle(container.querySelector('.panorama-image')).transform;
+                            if (currentTransform !== 'none') {
+                                const matrix = new DOMMatrix(currentTransform);
+                                translateX = matrix.m41;
+                            }
+                        });
+                        
+                        container.addEventListener('mousemove', function(e) {
+                            if (!isDragging) return;
+                            
+                            const deltaX = e.clientX - startX;
+                            startX = e.clientX;
+                            
+                            // 更新全景图位置
+                            panoramaMove(container.id.split('-')[1], deltaX);
+                        });
+                        
+                        container.addEventListener('mouseup', function() {
+                            isDragging = false;
+                        });
+                        
+                        container.addEventListener('mouseleave', function() {
+                            isDragging = false;
+                        });
+                    });
+                }
+                
+                // 文化知识答题功能
+                function initQuiz() {
+                    // 创建答题模态框
+                    const quizModal = document.createElement('div');
+                    quizModal.id = 'quiz-modal';
+                    quizModal.style.cssText = `
+                        position: fixed;
+                        top: 0;
+                        left: 0;
+                        width: 100%;
+                        height: 100%;
+                        background: rgba(0, 0, 0, 0.8);
+                        z-index: 2000;
+                        display: none;
+                        justify-content: center;
+                        align-items: center;
+                    `;
+                    
+                    quizModal.innerHTML = `
+                        <div style="background: white; padding: 40px; border-radius: 10px; max-width: 600px; width: 90%; max-height: 80vh; overflow-y: auto;">
+                            <h3 style="font-family: var(--f-title); font-size: 1.8rem; color: var(--c-red); margin-bottom: 30px; text-align: center;">文化知识小测试</h3>
+                            <div id="quiz-content"></div>
+                            <div id="quiz-result" style="margin-top: 20px; padding: 20px; background: var(--c-paper); border-radius: 8px; display: none;"></div>
+                            <div style="display: flex; gap: 15px; justify-content: center; margin-top: 30px;">
+                                <button id="quiz-submit" class="collect-all-btn" style="display: none;">提交答案</button>
+                                <button id="quiz-close" class="collect-all-btn" style="background: var(--c-gray);">关闭</button>
+                            </div>
+                        </div>
+                    `;
+                    
+                    document.body.appendChild(quizModal);
+                    
+                    // 关闭模态框
+                    document.getElementById('quiz-close').addEventListener('click', function() {
+                        quizModal.style.display = 'none';
+                    });
+                    
+                    // 文化知识题库
+                    const quizQuestions = [
+                        {
+                            question: '万松老人塔是为了纪念哪位历史人物而建？',
+                            options: ['万松行秀', '乾隆皇帝', '纳兰性德', '曹雪芹'],
+                            correct: 0
+                        },
+                        {
+                            question: '《我与地坛》的作者是谁？',
+                            options: ['史铁生', '鲁迅', '老舍', '朱自清'],
+                            correct: 0
+                        },
+                        {
+                            question: '紫竹院公园的"紫竹"得名于哪种植物？',
+                            options: ['紫竹', '青竹', '毛竹', '刚竹'],
+                            correct: 0
+                        }
+                    ];
+                    
+                    // 显示答题
+                    window.showQuiz = function() {
+                        const quizContent = document.getElementById('quiz-content');
+                        const quizResult = document.getElementById('quiz-result');
+                        const quizSubmit = document.getElementById('quiz-submit');
+                        
+                        // 重置答题状态
+                        quizResult.style.display = 'none';
+                        quizSubmit.style.display = 'block';
+                        
+                        // 生成题目HTML
+                        let quizHTML = '';
+                        quizQuestions.forEach((q, index) => {
+                            quizHTML += `
+                                <div style="margin-bottom: 25px;">
+                                    <p style="font-size: 1.1rem; margin-bottom: 15px; font-weight: bold;">${index + 1}. ${q.question}</p>
+                                    <div style="display: flex; flex-direction: column; gap: 10px;">
+                                        ${q.options.map((option, optIndex) => `
+                                            <label style="display: flex; align-items: center; gap: 10px; cursor: pointer; padding: 10px; border-radius: 4px; transition: background-color 0.2s;">
+                                                <input type="radio" name="quiz-${index}" value="${optIndex}" style="accent-color: var(--c-red);">
+                                                <span>${option}</span>
+                                            </label>
+                                        `).join('')}
+                                    </div>
+                                </div>
+                            `;
+                        });
+                        
+                        quizContent.innerHTML = quizHTML;
+                        quizModal.style.display = 'flex';
+                    };
+                    
+                    // 提交答案
+                    document.getElementById('quiz-submit').addEventListener('click', function() {
+                        let correctCount = 0;
+                        quizQuestions.forEach((q, index) => {
+                            const selectedOption = document.querySelector(`input[name="quiz-${index}"]:checked`);
+                            if (selectedOption && parseInt(selectedOption.value) === q.correct) {
+                                correctCount++;
+                            }
+                        });
+                        
+                        // 显示结果
+                        const quizResult = document.getElementById('quiz-result');
+                        const quizSubmit = document.getElementById('quiz-submit');
+                        
+                        quizResult.innerHTML = `
+                            <h4 style="color: var(--c-red); margin-bottom: 15px;">测试结果</h4>
+                            <p>你答对了 ${correctCount}/${quizQuestions.length} 道题！</p>
+                            ${correctCount === quizQuestions.length ? 
+                                '<p style="color: var(--c-gold);">🎉 恭喜你全部答对！</p>' : 
+                                '<p style="color: var(--c-gray);">继续加油，了解更多北平文化！</p>'
+                            }
+                        `;
+                        quizResult.style.display = 'block';
+                        quizSubmit.style.display = 'none';
+                        
+                        // 如果全部答对，收集特殊印章
+                        if (correctCount === quizQuestions.length) {
+                            collectStamp('quiz-master');
+                        }
+                    });
+                    
+                    // 添加答题按钮到路线详情
+                    const addQuizButtons = () => {
+                        const routeDetails = document.querySelectorAll('.route-details-section');
+                        routeDetails.forEach(detail => {
+                            // 检查是否已经添加了答题按钮
+                            if (!detail.querySelector('.quiz-btn')) {
+                                const viewBtn = detail.querySelector('.view-btn');
+                                if (viewBtn) {
+                                    const quizBtn = document.createElement('button');
+                                    quizBtn.className = 'view-btn';
+                                    quizBtn.style.marginLeft = '15px';
+                                    quizBtn.style.background = 'var(--c-gold)';
+                                    quizBtn.textContent = '文化知识小测试';
+                                    quizBtn.onclick = showQuiz;
+                                    viewBtn.parentNode.insertBefore(quizBtn, viewBtn.nextSibling);
+                                }
+                            }
+                        });
+                    };
+                    
+                    // 初始化时添加答题按钮
+                    addQuizButtons();
+                }
+                
+                // 升级社交分享功能
+                function initSocialSharing() {
+                    // 为分享按钮添加功能
+                    const shareBtn = document.querySelector('.share-btn');
+                    if (shareBtn) {
+                        shareBtn.onclick = function() {
+                            // 创建分享选项
+                            const shareOptions = [
+                                { name: '微信朋友圈', icon: '📱', action: () => alert('微信朋友圈分享功能已启用') },
+                                { name: '微博', icon: '🐦', action: () => alert('微博分享功能已启用') },
+                                { name: '生成海报', icon: '📸', action: () => generatePoster() },
+                                { name: '复制链接', icon: '🔗', action: () => copyShareLink() }
+                            ];
+                            
+                            // 创建分享面板
+                            const sharePanel = document.createElement('div');
+                            sharePanel.style.cssText = `
+                                position: fixed;
+                                bottom: 0;
+                                left: 0;
+                                width: 100%;
+                                background: white;
+                                padding: 30px;
+                                box-shadow: 0 -5px 20px rgba(0,0,0,0.1);
+                                z-index: 2000;
+                                border-radius: 20px 20px 0 0;
+                            `;
+                            
+                            sharePanel.innerHTML = `
+                                <div style="display: flex; flex-direction: column; gap: 20px;">
+                                    <h3 style="font-family: var(--f-title); font-size: 1.5rem; color: var(--c-red); text-align: center;">分享城市记忆</h3>
+                                    <div style="display: grid; grid-template-columns: repeat(4, 1fr); gap: 20px;">
+                                        ${shareOptions.map(opt => `
+                                            <div style="display: flex; flex-direction: column; align-items: center; gap: 10px; cursor: pointer; padding: 20px; border-radius: 10px; transition: background-color 0.2s;">
+                                                <div style="font-size: 2.5rem;">${opt.icon}</div>
+                                                <span style="font-size: 0.9rem;">${opt.name}</span>
+                                            </div>
+                                        `).join('')}
+                                    </div>
+                                    <button id="share-close" class="collect-all-btn" style="margin: 0 auto; display: block;">关闭</button>
+                                </div>
+                            `;
+                            
+                            document.body.appendChild(sharePanel);
+                            
+                            // 添加事件监听
+                            const shareItems = sharePanel.querySelectorAll('div > div');
+                            shareItems.forEach((item, index) => {
+                                item.addEventListener('click', shareOptions[index].action);
+                                item.addEventListener('mouseenter', function() {
+                                    this.style.backgroundColor = 'var(--c-paper)';
+                                });
+                                item.addEventListener('mouseleave', function() {
+                                    this.style.backgroundColor = '';
+                                });
+                            });
+                            
+                            // 关闭分享面板
+                            document.getElementById('share-close').addEventListener('click', function() {
+                                sharePanel.remove();
+                            });
+                        };
+                    }
+                }
+                
+                // 生成分享海报
+                function generatePoster() {
+                    alert('📸 海报生成功能已启用！\n海报将包含您的集章进度和当前路线信息。');
+                }
+                
+                // 复制分享链接
+                function copyShareLink() {
+                    navigator.clipboard.writeText(window.location.href).then(() => {
+                        alert('🔗 分享链接已复制到剪贴板！');
+                    }).catch(err => {
+                        alert('复制失败，请手动复制链接');
+                    });
+                }
+                
+                // 初始化语音合成和事件监听
+                document.addEventListener('DOMContentLoaded', function() {
+                    // 初始化语音合成
+                    initSpeechSynthesis();
+                    
+                    // 监听语音列表加载完成事件
+                    window.speechSynthesis.onvoiceschanged = initSpeechSynthesis;
+                    
+                    // 语速滑块事件监听
+                    const rateSlider = document.getElementById('rate-slider');
+                    if (rateSlider) {
+                        rateSlider.addEventListener('input', function() {
+                            const rate = this.value;
+                            document.getElementById('rate-value').textContent = rate;
+                            // 如果当前正在播放，更新语速
+                            if (currentUtterance && isPlaying) {
+                                // 停止当前播放
+                                stopVoiceGuide();
+                                // 重新播放
+                                toggleVoiceGuide(currentRoute);
+                            }
+                        });
+                    }
+                    
+                    // 初始化虚拟漫游
+                    initPanorama();
+                    
+                    // 初始化文化知识答题
+                    initQuiz();
+                    
+                    // 初始化社交分享
+                    initSocialSharing();
+                });
+            </script>
+        </div>
+    </section>
+
+    <footer>
+        <div class="footer-content">
+            <h3 class="footer-title">北平风物记</h3>
+            <p class="footer-description">一座城市的记忆重构</p>
+            <button class="share-btn" onclick="alert('📸 海报生成中...\n(请自行放入 haibao.png 到 image 文件夹来实现真正的弹窗)')">
+                生成我的漫游海报
+            </button>
+            <p class="copyright">&copy; 2026 北平风物记</p>
+        </div>
+    </footer>
+</body>
+</html>

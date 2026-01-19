@@ -1,0 +1,270 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>北平风物记 | 漫游地图</title>
+    <link href="https://fonts.googleapis.com/css2?family=Ma+Shan+Zheng&family=Noto+Serif+SC:wght@300;400;700&display=swap" rel="stylesheet">
+    <style>
+        /* --- 新增：沉浸式白噪音按钮 --- */
+.audio-wrapper {
+    margin-top: 15px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+.ambient-btn {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    padding: 8px 20px;
+    background: rgba(255, 255, 255, 0.6);
+    border: 1px solid var(--c-gray);
+    border-radius: 50px;
+    cursor: pointer;
+    font-family: var(--f-body);
+    font-size: 0.9rem;
+    color: var(--c-ink);
+    transition: all 0.3s ease;
+    backdrop-filter: blur(5px);
+}
+
+.ambient-btn:hover {
+    background: #fff;
+    border-color: var(--c-red);
+    color: var(--c-red);
+    transform: translateY(-2px);
+    box-shadow: 0 5px 15px rgba(0,0,0,0.05);
+}
+
+/* 播放状态 */
+.ambient-btn.playing {
+    background: var(--c-ink);
+    border-color: var(--c-ink);
+    color: var(--c-paper);
+}
+
+.ambient-btn.playing:hover {
+    background: var(--c-red);
+    border-color: var(--c-red);
+}
+
+/* 简单的声波动画图标 */
+.sound-wave {
+    display: flex;
+    align-items: center;
+    gap: 3px;
+    height: 12px;
+}
+
+.bar {
+    width: 2px;
+    height: 100%;
+    background-color: currentColor;
+    animation: none;
+}
+
+.ambient-btn.playing .bar {
+    animation: wave 1s infinite ease-in-out;
+}
+
+.ambient-btn.playing .bar:nth-child(1) { animation-delay: 0.0s; }
+.ambient-btn.playing .bar:nth-child(2) { animation-delay: 0.2s; }
+.ambient-btn.playing .bar:nth-child(3) { animation-delay: 0.4s; }
+.ambient-btn.playing .bar:nth-child(4) { animation-delay: 0.1s; }
+
+@keyframes wave {
+    0%, 100% { height: 20%; }
+    50% { height: 100%; }
+}
+        :root {
+            --c-red: #8E354A;       /* 宫墙红 */
+            --c-ink: #2C2C2C;       /* 徽墨 */
+            --c-gray: #5e616d;      /* 瓦灰 */
+            --c-paper: #F3F1E8;     /* 宣纸白 */
+            --c-gold: #B59868;      /* 鎏金 */
+            
+            --f-title: 'Ma Shan Zheng', cursive;
+            --f-body: 'Noto Serif SC', serif;
+            
+            --nav-height: 80px;
+        }
+
+        * { box-sizing: border-box; margin: 0; padding: 0; }
+        
+        body {
+            background-color: var(--c-paper);
+            color: var(--c-ink);
+            font-family: var(--f-body);
+            overflow-x: hidden;
+            /* 纸张纹理 */
+            background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noiseFilter'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.65' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noiseFilter)' opacity='0.05'/%3E%3C/svg%3E");
+        }
+
+        /* --- 【核心修改】单独设立的图片类 --- */
+        .project-img {
+            width: 100%;
+            height: 500px;          /* 统一高度，保持整齐 */
+            object-fit: cover;      /* 智能裁剪，防止变形 */
+            border-radius: 4px;     /* 微圆角 */
+            box-shadow: 20px 20px 0px rgba(0,0,0,0.05); /* 新中式阴影 */
+            transition: transform 0.8s ease, filter 0.5s ease;
+            filter: sepia(0.1);     /* 轻微复古滤镜 */
+        }
+
+        /* 鼠标悬停时的图片动效 */
+        .article-block:hover .project-img {
+            transform: scale(1.02);
+            filter: sepia(0);
+        }
+
+        /* --- 0. 开场动画 --- */
+        #intro-overlay {
+            position: fixed; inset: 0; z-index: 9999;
+            background: var(--c-ink); color: var(--c-paper);
+            display: flex; flex-direction: column; align-items: center; justify-content: center;
+            transition: opacity 1s ease, visibility 1s;
+        }
+        .intro-text { font-family: var(--f-title); font-size: 3.5rem; writing-mode: vertical-rl; letter-spacing: 0.5rem; margin-bottom: 40px; }
+        .btn-enter { padding: 12px 40px; border: 1px solid var(--c-paper); background: transparent; color: var(--c-paper); cursor: pointer; font-family: var(--f-body); letter-spacing: 2px; transition: 0.4s; font-size: 1.1rem; }
+        .btn-enter:hover { background: var(--c-paper); color: var(--c-ink); box-shadow: 0 0 20px rgba(255,255,255,0.3); }
+
+        /* --- 1. 导航栏 --- */
+        nav {
+            position: fixed; top: 0; width: 100%; height: var(--nav-height);
+            background: rgba(243, 241, 232, 0.95); backdrop-filter: blur(10px);
+            border-bottom: 1px solid rgba(0,0,0,0.05); z-index: 1000;
+            display: flex; justify-content: space-between; align-items: center;
+            padding: 0 40px; transition: all 0.3s;
+        }
+        .logo { font-family: var(--f-title); font-size: 2rem; color: var(--c-red); text-decoration: none; }
+        .menu { display: flex; gap: 40px; height: 100%; align-items: center; }
+        .menu-item { position: relative; height: 100%; display: flex; align-items: center; cursor: pointer; font-size: 1rem; color: var(--c-ink); text-decoration: none; transition: 0.3s; }
+        .menu-item:hover { color: var(--c-red); }
+        
+        /* 二级菜单 */
+        .dropdown {
+            position: absolute; top: var(--nav-height); left: 50%; transform: translateX(-50%);
+            background: #fff; box-shadow: 0 10px 30px rgba(0,0,0,0.1);
+            padding: 20px 0; min-width: 180px; opacity: 0; visibility: hidden;
+            transition: all 0.3s ease; border-top: 3px solid var(--c-red);
+        }
+        .menu-item:hover .dropdown { opacity: 1; visibility: visible; top: var(--nav-height); }
+        .dropdown a { display: block; padding: 12px 30px; color: #666; text-decoration: none; font-size: 0.95rem; transition: 0.2s; white-space: nowrap; }
+        .dropdown a:hover { background: var(--c-paper); color: var(--c-red); padding-left: 35px; }
+
+        /* --- 3. 交互地图 (背景图) --- */
+        #map-section { padding: 100px 0; background: #e8e6dc; position: relative; overflow: hidden; }
+        .map-container {
+            width: 100%; height: 80vh; max-width: 1200px; margin: 0 auto;
+            position: relative;
+            /* 修改：使用本地图片 ditu.png */
+            background: url('image/ditu.png') center/cover no-repeat;
+            border-radius: 4px; box-shadow: 0 20px 50px rgba(0,0,0,0.1);
+        }
+        .map-title { position: absolute; top: 40px; left: 40px; font-family: var(--f-title); font-size: 3rem; color: #fff; text-shadow: 0 2px 10px rgba(0,0,0,0.5); z-index: 20; }
+        
+        /* 地图标记点 */
+        .pin {
+            position: absolute; width: 24px; height: 24px; background: var(--c-red);
+            border: 3px solid #fff; border-radius: 50%; cursor: pointer; z-index: 10;
+            box-shadow: 0 4px 10px rgba(0,0,0,0.3); transition: transform 0.3s;
+        }
+        .pin:hover { transform: scale(1.3); }
+        .pin::after { content: ''; position: absolute; inset: -10px; border: 2px solid var(--c-red); border-radius: 50%; animation: pulse 2s infinite; opacity: 0; }
+        
+        .map-card {
+            position: absolute; bottom: 40px; left: 40px; width: 300px; background: rgba(255,255,255,0.95);
+            padding: 25px; border-left: 5px solid var(--c-red); opacity: 0; transform: translateY(20px);
+            transition: all 0.4s ease; pointer-events: none; backdrop-filter: blur(5px);
+        }
+        .map-card.active { opacity: 1; transform: translateY(0); pointer-events: auto; }
+
+        /* Footer */
+        footer { background: var(--c-ink); color: #888; padding: 80px 0; text-align: center; }
+        .share-btn { padding: 15px 50px; background: transparent; border: 1px solid #666; color: #fff; font-size: 1rem; cursor: pointer; transition: 0.3s; }
+        .share-btn:hover { background: var(--c-gold); border-color: var(--c-gold); color: #000; }
+
+        /* 动画 */
+        @keyframes pulse { 0% { opacity: 0.8; transform: scale(1); } 100% { opacity: 0; transform: scale(3); } }
+        .reveal { opacity: 0; transform: translateY(30px); transition: all 0.8s ease; }
+        .reveal.active { opacity: 1; transform: translateY(0); }
+
+        @media (max-width: 768px) {
+            .hero-title { font-size: 3rem; }
+            .article-block, .article-block.reverse { grid-template-columns: 1fr; direction: ltr; }
+            .project-img { height: 300px; }
+            .menu { display: none; }
+        }
+    </style>
+</head>
+<body>
+
+    <nav>
+        <a href="index.html" class="logo">
+            <img src="image/logo.png" alt="北平风物记" style="width: 40px; height: 40px; object-fit: contain;">
+            <span style="margin-left: 10px; font-family: var(--f-title); font-size: 1.5rem; color: var(--c-red);">北平风物记</span>
+        </a>
+        <div class="menu">
+            <a href="index.html" class="menu-item">首页</a>
+            <a href="map.html" class="menu-item">漫游地图</a>
+            <div class="menu-item">
+                路线策展
+                <div class="dropdown">
+                    <a href="literature-route.html">文学与光阴</a>
+                    <a href="jiangnan-route.html">北平江南</a>
+                    <a href="ditan-route.html">与地坛同呼吸</a>
+                </div>
+            </div>
+            <a href="about.html" class="menu-item">关于我们</a>
+        </div>
+    </nav>
+
+    <section id="map-section">
+        <div class="map-container">
+            <div class="map-title">风物地图</div>
+            
+            <div class="pin" style="top: 45%; left: 40%;" onclick="showMapCard('literature')"></div>
+            <div class="pin" style="top: 30%; left: 25%;" onclick="showMapCard('jiangnan')"></div>
+            <div class="pin" style="top: 25%; left: 60%;" onclick="showMapCard('ditan')"></div>
+
+            <div class="map-card" id="map-card-content">
+                <h3 id="card-title" style="font-size: 1.5rem; margin-bottom: 10px; color: var(--c-red);">地点名称</h3>
+                <p id="card-desc" style="color: #666; line-height: 1.6; margin-bottom: 20px;">地点描述信息...</p>
+                <a id="card-link" href="#" style="color: var(--c-ink); font-weight: bold; text-decoration: none; border-bottom: 1px solid currentColor;">进入路线 &rarr;</a>
+            </div>
+        </div>
+    </section>
+
+    <footer id="footer">
+        <h3>北平风物记</h3>
+        <p style="margin-bottom: 30px;">一座城市的记忆重构</p>
+        <p style="margin-top: 60px; font-size: 0.8rem; opacity: 0.5;">&copy; 2026 北平风物记</p>
+    </footer>
+
+    <script>
+        // 地图数据
+        const mapData = {
+            'literature': { title: '古塔与书局', desc: '西四南大街的万松老人塔与正阳书局。', link: 'literature-route.html' },
+            'jiangnan': { title: '紫竹院', desc: '皇家园林的南渡梦影。', link: 'jiangnan-route.html' },
+            'ditan': { title: '地坛公园', desc: '史铁生的精神家园。', link: 'ditan-route.html' }
+        };
+
+        function showMapCard(key) {
+            const data = mapData[key];
+            const card = document.getElementById('map-card-content');
+            card.style.opacity = 0;
+            card.style.transform = 'translateY(10px)';
+            setTimeout(() => {
+                document.getElementById('card-title').innerText = data.title;
+                document.getElementById('card-desc').innerText = data.desc;
+                document.getElementById('card-link').href = data.link;
+                card.classList.add('active');
+                card.style.opacity = 1;
+                card.style.transform = 'translateY(0)';
+            }, 300);
+        }
+    </script>
+</body>
+</html>

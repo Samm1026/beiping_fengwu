@@ -1,0 +1,535 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>北平风物记 | 文学与光阴的交错</title>
+    <link href="https://fonts.googleapis.com/css2?family=Ma+Shan+Zheng&family=Noto+Serif+SC:wght@300;400;700&display=swap" rel="stylesheet">
+    <style>
+        /* --- 新增：沉浸式白噪音按钮 --- */
+.audio-wrapper {
+    margin-top: 15px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+.ambient-btn {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    padding: 8px 20px;
+    background: rgba(255, 255, 255, 0.6);
+    border: 1px solid var(--c-gray);
+    border-radius: 50px;
+    cursor: pointer;
+    font-family: var(--f-body);
+    font-size: 0.9rem;
+    color: var(--c-ink);
+    transition: all 0.3s ease;
+    backdrop-filter: blur(5px);
+}
+
+.ambient-btn:hover {
+    background: #fff;
+    border-color: var(--c-red);
+    color: var(--c-red);
+    transform: translateY(-2px);
+    box-shadow: 0 5px 15px rgba(0,0,0,0.05);
+}
+
+/* 播放状态 */
+.ambient-btn.playing {
+    background: var(--c-ink);
+    border-color: var(--c-ink);
+    color: var(--c-paper);
+}
+
+.ambient-btn.playing:hover {
+    background: var(--c-red);
+    border-color: var(--c-red);
+}
+
+/* 简单的声波动画图标 */
+.sound-wave {
+    display: flex;
+    align-items: center;
+    gap: 3px;
+    height: 12px;
+}
+
+.bar {
+    width: 2px;
+    height: 100%;
+    background-color: currentColor;
+    animation: none;
+}
+
+.ambient-btn.playing .bar {
+    animation: wave 1s infinite ease-in-out;
+}
+
+.ambient-btn.playing .bar:nth-child(1) { animation-delay: 0.0s; }
+.ambient-btn.playing .bar:nth-child(2) { animation-delay: 0.2s; }
+.ambient-btn.playing .bar:nth-child(3) { animation-delay: 0.4s; }
+.ambient-btn.playing .bar:nth-child(4) { animation-delay: 0.1s; }
+
+@keyframes wave {
+    0%, 100% { height: 20%; }
+    50% { height: 100%; }
+}
+        :root {
+            --c-red: #8E354A;       /* 宫墙红 */
+            --c-ink: #2C2C2C;       /* 徽墨 */
+            --c-gray: #5e616d;      /* 瓦灰 */
+            --c-paper: #F3F1E8;     /* 宣纸白 */
+            --c-gold: #B59868;      /* 鎏金 */
+            
+            --f-title: 'Ma Shan Zheng', cursive;
+            --f-body: 'Noto Serif SC', serif;
+            
+            --nav-height: 80px;
+        }
+
+        * { box-sizing: border-box; margin: 0; padding: 0; }
+        
+        body {
+            background-color: var(--c-paper);
+            color: var(--c-ink);
+            font-family: var(--f-body);
+            overflow-x: hidden;
+            /* 纸张纹理 */
+            background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noiseFilter'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.65' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noiseFilter)' opacity='0.05'/%3E%3C/svg%3E");
+        }
+
+        /* --- 【核心修改】单独设立的图片类 --- */
+        .project-img {
+            width: 100%;
+            height: 500px;          /* 统一高度，保持整齐 */
+            object-fit: cover;      /* 智能裁剪，防止变形 */
+            border-radius: 4px;     /* 微圆角 */
+            box-shadow: 20px 20px 0px rgba(0,0,0,0.05); /* 新中式阴影 */
+            transition: transform 0.8s ease, filter 0.5s ease;
+            filter: sepia(0.1);     /* 轻微复古滤镜 */
+        }
+
+        /* 鼠标悬停时的图片动效 */
+        .article-block:hover .project-img {
+            transform: scale(1.02);
+            filter: sepia(0);
+        }
+
+        /* --- 0. 开场动画 --- */
+        #intro-overlay {
+            position: fixed; inset: 0; z-index: 9999;
+            background: var(--c-ink); color: var(--c-paper);
+            display: flex; flex-direction: column; align-items: center; justify-content: center;
+            transition: opacity 1s ease, visibility 1s;
+        }
+        .intro-text { font-family: var(--f-title); font-size: 3.5rem; writing-mode: vertical-rl; letter-spacing: 0.5rem; margin-bottom: 40px; }
+        .btn-enter { padding: 12px 40px; border: 1px solid var(--c-paper); background: transparent; color: var(--c-paper); cursor: pointer; font-family: var(--f-body); letter-spacing: 2px; transition: 0.4s; font-size: 1.1rem; }
+        .btn-enter:hover { background: var(--c-paper); color: var(--c-ink); box-shadow: 0 0 20px rgba(255,255,255,0.3); }
+
+        /* --- 1. 导航栏 --- */
+        nav {
+            position: fixed; top: 0; width: 100%; height: var(--nav-height);
+            background: rgba(243, 241, 232, 0.95); backdrop-filter: blur(10px);
+            border-bottom: 1px solid rgba(0,0,0,0.05); z-index: 1000;
+            display: flex; justify-content: space-between; align-items: center;
+            padding: 0 40px; transition: all 0.3s;
+        }
+        .logo { font-family: var(--f-title); font-size: 2rem; color: var(--c-red); text-decoration: none; }
+        .menu { display: flex; gap: 40px; height: 100%; align-items: center; }
+        .menu-item { position: relative; height: 100%; display: flex; align-items: center; cursor: pointer; font-size: 1rem; color: var(--c-ink); text-decoration: none; transition: 0.3s; }
+        .menu-item:hover { color: var(--c-red); }
+        
+        /* 二级菜单 */
+        .dropdown {
+            position: absolute; top: var(--nav-height); left: 50%; transform: translateX(-50%);
+            background: #fff; box-shadow: 0 10px 30px rgba(0,0,0,0.1);
+            padding: 20px 0; min-width: 180px; opacity: 0; visibility: hidden;
+            transition: all 0.3s ease; border-top: 3px solid var(--c-red);
+        }
+        .menu-item:hover .dropdown { opacity: 1; visibility: visible; top: var(--nav-height); }
+        .dropdown a { display: block; padding: 12px 30px; color: #666; text-decoration: none; font-size: 0.95rem; transition: 0.2s; white-space: nowrap; }
+        .dropdown a:hover { background: var(--c-paper); color: var(--c-red); padding-left: 35px; }
+
+        /* --- 4. 路线布局 --- */
+        .route-container { max-width: 1000px; margin: 150px auto; padding: 0 24px; }
+        .route-header { text-align: center; margin-bottom: 80px; position: relative; }
+        .route-header h2 { font-size: 3.5rem; color: var(--c-red); margin-bottom: 10px; }
+        .route-header span { font-size: 1rem; letter-spacing: 4px; color: var(--c-gray); text-transform: uppercase; }
+        
+        .article-block { display: grid; grid-template-columns: 1fr 1fr; gap: 60px; margin-bottom: 100px; align-items: center; }
+        .article-block.reverse { direction: rtl; }
+        .article-block.reverse .text-wrap { direction: ltr; }
+        
+        .text-wrap h3 { font-size: 1.8rem; margin-bottom: 20px; color: var(--c-ink); border-left: 4px solid var(--c-gold); padding-left: 15px; }
+        .text-wrap p { line-height: 1.8; margin-bottom: 20px; text-align: justify; font-size: 1.05rem; }
+        .text-wrap .drop-cap { float: left; font-size: 3.5rem; line-height: 0.8; padding-right: 10px; color: var(--c-red); font-family: var(--f-title); }
+        
+        .img-wrap { overflow: hidden; border-radius: 4px; } /* 包裹层 */
+
+        /* --- 任务卡 --- */
+        .task-box {
+            background: #222; color: #f3f1e8; padding: 40px; margin: 60px 0;
+            text-align: center; border: 1px solid var(--c-gold); position: relative;
+            background-image: url("data:image/svg+xml,%3Csvg width='20' height='20' viewBox='0 0 20 20' xmlns='http://www.w3.org/2000/svg'%3E%3Ccircle cx='2' cy='2' r='1' fill='%23B59868' fill-opacity='0.2'/%3E%3C/svg%3E");
+        }
+        .task-title { color: var(--c-gold); font-family: var(--f-title); font-size: 1.5rem; margin-bottom: 20px; }
+        .task-content { font-size: 1.2rem; min-height: 60px; display: flex; align-items: center; justify-content: center; font-style: italic; transition: opacity 0.3s; }
+        .btn-task { margin-top: 20px; padding: 10px 30px; background: var(--c-red); border: none; color: white; cursor: pointer; font-family: var(--f-body); font-size: 1rem; }
+        .btn-task:hover { background: #fff; color: var(--c-red); }
+
+        /* Footer */
+        footer { background: var(--c-ink); color: #888; padding: 80px 0; text-align: center; }
+        .share-btn { padding: 15px 50px; background: transparent; border: 1px solid #666; color: #fff; font-size: 1rem; cursor: pointer; transition: 0.3s; }
+        .share-btn:hover { background: var(--c-gold); border-color: var(--c-gold); color: #000; }
+
+        /* 动画 */
+        @keyframes pulse { 0% { opacity: 0.8; transform: scale(1); } 100% { opacity: 0; transform: scale(3); } }
+        .reveal { opacity: 0; transform: translateY(30px); transition: all 0.8s ease; }
+        .reveal.active { opacity: 1; transform: translateY(0); }
+
+        @media (max-width: 768px) {
+            .hero-title { font-size: 3rem; }
+            .article-block, .article-block.reverse { grid-template-columns: 1fr; direction: ltr; }
+            .project-img { height: 300px; }
+            .menu { display: none; }
+        }
+    </style>
+</head>
+<body>
+
+    <nav>
+        <a href="index.html" class="logo">
+            <img src="image/logo.png" alt="北平风物记" style="width: 40px; height: 40px; object-fit: contain;">
+            <span style="margin-left: 10px; font-family: var(--f-title); font-size: 1.5rem; color: var(--c-red);">北平风物记</span>
+        </a>
+        <div class="menu">
+            <a href="index.html" class="menu-item">首页</a>
+            <a href="map.html" class="menu-item">漫游地图</a>
+            <div class="menu-item">
+                路线策展
+                <div class="dropdown">
+                    <a href="literature-route.html">文学与光阴</a>
+                    <a href="jiangnan-route.html">北平江南</a>
+                    <a href="ditan-route.html">与地坛同呼吸</a>
+                </div>
+            </div>
+            <a href="about.html" class="menu-item">关于我们</a>
+        </div>
+    </nav>
+
+    <section id="literature-route" class="route-container">
+        <div class="route-header reveal">
+    <span>ROUTE 01</span>
+    <h2>文学与光阴的交错</h2>
+    <p>从古塔到藏书楼的北平三重时间</p>
+    
+    <div class="audio-wrapper">
+        <button class="ambient-btn" onclick="toggleSound('audio-lit', this)">
+            <div class="sound-wave">
+                <div class="bar"></div><div class="bar"></div><div class="bar"></div><div class="bar"></div>
+            </div>
+            <span>沉浸 · 翻书声</span>
+        </button>
+        <audio id="audio-lit" loop src="audio/book.mp3"></audio>
+    </div>
+</div>
+        <div class="article-block reveal">
+            <div class="text-wrap">
+                <h3>序章：一座塔，一部立在地上的密语</h3>
+                <p><span class="drop-cap">站</span>在西四南大街的喧嚣里，抬头望见万松老人塔，八百余年的青砖八角密檐塔，谦卑地嵌在胡同肌理中，与百姓烟火为邻。塔主万松行秀是金元禅宗巨匠，其弟子耶律楚材——辅佐成吉思汗的一代名相，曾在此参学。</p>
+            </div>
+            <div class="img-wrap">
+                <img src="image/wansongta.png" class="project-img" alt="万松老人塔">
+            </div>
+        </div>
+
+        <div class="article-block reverse reveal">
+            <div class="text-wrap">
+                <h3>第一章：塔下书局，呼吸着的记忆</h3>
+                <p>塔影所覆，便是正阳书局。推开不起眼的木门，仿佛跌进平行时空，这里是北京唯一专营北京地方文献的旧书店。泛黄的旧书、手绘地图、老照片，空气里弥漫着旧纸张与时光混合的芬芳。</p>
+            </div>
+            <div class="img-wrap">
+                <img src="image/zhengyangshuju.png" class="project-img" alt="正阳书局">
+            </div>
+        </div>
+
+        <div class="task-box reveal">
+            <div class="task-title">✉️ 漫步任务 · 书局探索</div>
+            <div class="task-content" id="task-text-1">"点击下方按钮，抽取你的书局探索任务"</div>
+            <button class="btn-task" onclick="cycleTask(1)">抽取任务</button>
+        </div>
+
+        <div class="article-block reveal">
+            <div class="text-wrap">
+                <h3>第二章：红楼一梦，从光影到纸页的轮回</h3>
+                <p>沿西安门大街西行不远，由红楼电影院改造的红楼公共藏书楼跃然眼前。1955年，它是首都第一家宽银幕立体声电影院；2018年，它转型为藏书楼，将放映机换成层层书格，延续着知识的生命。</p>
+            </div>
+            <div class="img-wrap">
+                <img src="image/honglou.png" class="project-img" alt="红楼藏书楼">
+            </div>
+        </div>
+
+        <div class="task-box reveal">
+            <div class="task-title">✉️ 漫步任务 · 红楼寻踪</div>
+            <div class="task-content" id="task-text-2">"点击下方按钮，抽取你的红楼探索任务"</div>
+            <button class="btn-task" onclick="cycleTask(2)">抽取任务</button>
+        </div>
+
+        <div class="article-block reverse reveal">
+            <div class="text-wrap">
+                <h3>尾声：三重时间的叠印</h3>
+                <p>从万松老人塔（凝固的时间），到正阳书局（呼吸的时间），再到红楼藏书楼（流动的时间），不到一公里的路线完成了一场精妙的时空折叠。文学是贯穿这三重时间的金线，让每一个地点都充满了精神的温度。</p>
+            </div>
+            <div class="img-wrap">
+                <img src="image/wenyuelou.png" class="project-img" alt="红楼藏书楼内部">
+            </div>
+        </div>
+
+        <!-- 文学交互小游戏 -->
+        <div class="article-block reveal" style="margin-top: 100px;">
+            <div class="text-wrap" style="grid-column: 1 / -1; text-align: center;">
+                <h3 style="text-align: center; border-left: none; display: inline-block; border-bottom: 4px solid var(--c-gold); padding-bottom: 10px; padding-left: 0;">📚 文学拼图游戏</h3>
+                <p style="margin-top: 30px; font-size: 1.2rem;">将打乱的诗句重新排列，拼出完整的文学经典片段</p>
+            </div>
+        </div>
+
+        <div class="article-block reveal" style="margin-bottom: 100px;">
+            <div class="text-wrap" style="grid-column: 1 / -1;">
+                <div id="poem-puzzle" style="background: white; padding: 40px; border-radius: 8px; box-shadow: 0 10px 30px rgba(0,0,0,0.05);">
+                    <h4 id="puzzle-title" style="text-align: center; margin-bottom: 20px; color: var(--c-red);"></h4>
+                    <div id="puzzle-container" style="display: flex; flex-wrap: wrap; gap: 15px; justify-content: center; margin-bottom: 30px;"></div>
+                    <div id="puzzle-answer" style="text-align: center; margin-bottom: 20px; font-style: italic; color: var(--c-gray);"></div>
+                    <div style="display: flex; justify-content: center; gap: 20px;">
+                        <button id="start-puzzle" class="btn-task" style="background: var(--c-red); color: white; border: none; padding: 12px 30px; border-radius: 4px; cursor: pointer; transition: all 0.3s ease;">开始游戏</button>
+                        <button id="check-puzzle" class="btn-task" style="background: var(--c-gold); color: white; border: none; padding: 12px 30px; border-radius: 4px; cursor: pointer; transition: all 0.3s ease; display: none;">检查答案</button>
+                        <button id="reset-puzzle" class="btn-task" style="background: var(--c-gray); color: white; border: none; padding: 12px 30px; border-radius: 4px; cursor: pointer; transition: all 0.3s ease; display: none;">重新开始</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+
+    </section>
+
+    <footer id="footer">
+        <h3>北平风物记</h3>
+        <p style="margin-bottom: 30px;">一座城市的记忆重构</p>
+        <button class="share-btn" onclick="alert('📸 海报生成中...\n(请自行放入 haibao.png 到 image 文件夹来实现真正的弹窗)')">
+            生成我的漫游海报
+        </button>
+        <p style="margin-top: 60px; font-size: 0.8rem; opacity: 0.5;">&copy; 2026 北平风物记</p>
+    </footer>
+
+    <script>
+        // 滚动显现
+        const observer = new IntersectionObserver((entries) => {
+            entries.forEach(entry => {
+                if (entry.isIntersecting) entry.target.classList.add('active');
+            });
+        }, { threshold: 0.1 });
+        document.querySelectorAll('.reveal').forEach(el => observer.observe(el));
+
+        // 任务卡
+        const tasks = {
+            1: ["找一本出版年份早于你出生年份的北京地图。", "发现一件与你姓氏相关的北京老地名。", "问掌柜关于古塔的故事。"],
+            2: ["找一幅描绘雨中山水的画作。", "寻找画意与真境交汇的瞬间。", "拍摄一个构图像极了古画的局部。"],
+            3: ["在方泽坛静默五分钟，只听风声。", "记下此刻脑中盘旋的一个问题。", "思考这个空间如何成为心理咨询室。"]
+        };
+
+        function cycleTask(id) {
+            const textEl = document.getElementById(`task-text-${id}`);
+            const list = tasks[id];
+            textEl.style.opacity = 0;
+            setTimeout(() => {
+                textEl.innerText = `“${list[Math.floor(Math.random() * list.length)]}”`;
+                textEl.style.opacity = 1;
+            }, 300);
+        }
+        // --- 文学交互小游戏：诗歌拼图 ---        
+        // 诗歌数据
+        const poems = [
+            {
+                id: 1,
+                title: "万松老人塔·耶律楚材",
+                author: "元代诗人 耶律楚材",
+                content: [
+                    "阴山千里横东西",
+                    "秋声浩浩鸣秋溪",
+                    "万松岭上塔玲珑",
+                    "疑是浮屠入云际"
+                ]
+            },
+            {
+                id: 2,
+                title: "图书馆的诗",
+                author: "现代 博尔赫斯",
+                content: [
+                    "天堂应该是图书馆的模样",
+                    "在知识的海洋中徜徉",
+                    "每一本书都是一个世界",
+                    "每一页都藏着无限可能"
+                ]
+            }
+        ];
+
+        let currentPoem = null;
+        let selectedPieces = [];
+
+        // 初始化拼图游戏
+        function initPoemPuzzle() {
+            const startBtn = document.getElementById('start-puzzle');
+            const checkBtn = document.getElementById('check-puzzle');
+            const resetBtn = document.getElementById('reset-puzzle');
+
+            startBtn.addEventListener('click', startPuzzle);
+            checkBtn.addEventListener('click', checkPuzzle);
+            resetBtn.addEventListener('click', resetPuzzle);
+        }
+
+        // 开始游戏
+        function startPuzzle() {
+            // 随机选择一首诗
+            currentPoem = poems[Math.floor(Math.random() * poems.length)];
+            
+            // 更新标题
+            document.getElementById('puzzle-title').innerText = `${currentPoem.title} - ${currentPoem.author}`;
+            
+            // 打乱诗句顺序
+            const shuffledContent = [...currentPoem.content].sort(() => Math.random() - 0.5);
+            
+            // 创建拼图块
+            const puzzleContainer = document.getElementById('puzzle-container');
+            puzzleContainer.innerHTML = '';
+            
+            shuffledContent.forEach((line, index) => {
+                const piece = document.createElement('div');
+                piece.className = 'puzzle-piece';
+                piece.innerText = line;
+                piece.dataset.answer = line;
+                piece.style.cssText = `
+                    background: var(--c-paper);
+                    border: 2px solid var(--c-gray);
+                    border-radius: 8px;
+                    padding: 15px 25px;
+                    cursor: pointer;
+                    transition: all 0.3s ease;
+                    font-size: 1.1rem;
+                    font-family: var(--f-body);
+                    color: var(--c-ink);
+                    box-shadow: 0 4px 10px rgba(0,0,0,0.05);
+                `;
+                
+                // 添加点击事件
+                piece.addEventListener('click', () => selectPiece(piece));
+                
+                puzzleContainer.appendChild(piece);
+            });
+            
+            // 重置选择
+            selectedPieces = [];
+            document.getElementById('puzzle-answer').innerText = '';
+            
+            // 更新按钮显示
+            document.getElementById('start-puzzle').style.display = 'none';
+            document.getElementById('check-puzzle').style.display = 'inline-block';
+            document.getElementById('reset-puzzle').style.display = 'inline-block';
+        }
+
+        // 选择拼图块
+        function selectPiece(piece) {
+            // 如果已经选择了这个块，取消选择
+            const index = selectedPieces.indexOf(piece);
+            if (index > -1) {
+                selectedPieces.splice(index, 1);
+                piece.style.borderColor = 'var(--c-gray)';
+                piece.style.transform = 'scale(1)';
+            } else {
+                // 否则添加到选择列表
+                selectedPieces.push(piece);
+                piece.style.borderColor = 'var(--c-red)';
+                piece.style.transform = 'scale(1.05)';
+            }
+        }
+
+        // 检查答案
+        function checkPuzzle() {
+            // 检查是否选择了所有诗句
+            if (selectedPieces.length !== currentPoem.content.length) {
+                document.getElementById('puzzle-answer').innerText = `请选择所有${currentPoem.content.length}句诗句！`;
+                return;
+            }
+            
+            // 检查顺序是否正确
+            const userAnswer = selectedPieces.map(piece => piece.dataset.answer);
+            const isCorrect = JSON.stringify(userAnswer) === JSON.stringify(currentPoem.content);
+            
+            if (isCorrect) {
+                document.getElementById('puzzle-answer').innerText = '🎉 恭喜你，拼图成功！';
+                document.getElementById('puzzle-answer').style.color = 'var(--c-red)';
+                
+                // 高亮正确答案
+                selectedPieces.forEach(piece => {
+                    piece.style.background = 'var(--c-red)';
+                    piece.style.color = 'white';
+                    piece.style.borderColor = 'var(--c-red)';
+                });
+            } else {
+                document.getElementById('puzzle-answer').innerText = '💡 再试一次，顺序可能不对哦！';
+                document.getElementById('puzzle-answer').style.color = 'var(--c-gold)';
+            }
+        }
+
+        // 重置游戏
+        function resetPuzzle() {
+            selectedPieces = [];
+            document.getElementById('puzzle-container').innerHTML = '';
+            document.getElementById('puzzle-title').innerText = '';
+            document.getElementById('puzzle-answer').innerText = '';
+            
+            // 更新按钮显示
+            document.getElementById('start-puzzle').style.display = 'inline-block';
+            document.getElementById('check-puzzle').style.display = 'none';
+            document.getElementById('reset-puzzle').style.display = 'none';
+        }
+
+        // 初始化游戏
+        initPoemPuzzle();
+        
+        // --- 音频控制逻辑 ---
+function toggleSound(audioId, btnElement) {
+    const audio = document.getElementById(audioId);
+    
+    // 1. 如果当前正在播放，则暂停
+    if (!audio.paused) {
+        audio.pause();
+        btnElement.classList.remove('playing');
+        btnElement.querySelector('span').innerText = btnElement.querySelector('span').innerText.replace('暂停', '沉浸');
+        return;
+    }
+
+    // 2. 如果当前是暂停状态，先停止所有其他音频（互斥播放）
+    document.querySelectorAll('audio').forEach(a => {
+        a.pause();
+        a.currentTime = 0; // 可选：重置进度
+    });
+    document.querySelectorAll('.ambient-btn').forEach(btn => {
+        btn.classList.remove('playing');
+        //不仅重置样式，文字也建议复原，这里简单处理
+    });
+
+    // 3. 播放当前选中的音频
+    audio.play();
+    btnElement.classList.add('playing');
+    
+    // 4. (可选) 修改按钮文字提示状态
+    const textSpan = btnElement.querySelector('span');
+    // 如果想让文字变成"暂停"，可以把下面注释打开
+    // textSpan.innerText = textSpan.innerText.replace('沉浸', '暂停'); 
+}
+    </script>
+</body>
+</html>

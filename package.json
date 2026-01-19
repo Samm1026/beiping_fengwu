@@ -1,0 +1,19 @@
+{
+  "dependencies": {
+    "cors": "^2.8.5",
+    "dotenv": "^17.2.3",
+    "express": "^5.2.1",
+    "node-fetch": "^3.3.2"
+  },
+  "name": "code3",
+  "version": "1.0.0",
+  "description": "北平风物记是一个关于北京文化漫游路线的网站，旨在为用户提供有叙事深度的文化漫游体验。网站围绕用户的深度文化漫游需求，搭建了四大核心功能模块，打造沉浸式体验闭环。",
+  "main": "server.js",
+"scripts": {
+    "start": "node server.js"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "type": "commonjs"
+}

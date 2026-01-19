@@ -1,0 +1,472 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>北平风物记 | 北京的江南烟雨</title>
+    <link href="https://fonts.googleapis.com/css2?family=Ma+Shan+Zheng&family=Noto+Serif+SC:wght@300;400;700&display=swap" rel="stylesheet">
+    <style>
+        /* --- 新增：沉浸式白噪音按钮 --- */
+.audio-wrapper {
+    margin-top: 15px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+.ambient-btn {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    padding: 8px 20px;
+    background: rgba(255, 255, 255, 0.6);
+    border: 1px solid var(--c-gray);
+    border-radius: 50px;
+    cursor: pointer;
+    font-family: var(--f-body);
+    font-size: 0.9rem;
+    color: var(--c-ink);
+    transition: all 0.3s ease;
+    backdrop-filter: blur(5px);
+}
+
+.ambient-btn:hover {
+    background: #fff;
+    border-color: var(--c-red);
+    color: var(--c-red);
+    transform: translateY(-2px);
+    box-shadow: 0 5px 15px rgba(0,0,0,0.05);
+}
+
+/* 播放状态 */
+.ambient-btn.playing {
+    background: var(--c-ink);
+    border-color: var(--c-ink);
+    color: var(--c-paper);
+}
+
+.ambient-btn.playing:hover {
+    background: var(--c-red);
+    border-color: var(--c-red);
+}
+
+/* 简单的声波动画图标 */
+.sound-wave {
+    display: flex;
+    align-items: center;
+    gap: 3px;
+    height: 12px;
+}
+
+.bar {
+    width: 2px;
+    height: 100%;
+    background-color: currentColor;
+    animation: none;
+}
+
+.ambient-btn.playing .bar {
+    animation: wave 1s infinite ease-in-out;
+}
+
+.ambient-btn.playing .bar:nth-child(1) { animation-delay: 0.0s; }
+.ambient-btn.playing .bar:nth-child(2) { animation-delay: 0.2s; }
+.ambient-btn.playing .bar:nth-child(3) { animation-delay: 0.4s; }
+.ambient-btn.playing .bar:nth-child(4) { animation-delay: 0.1s; }
+
+@keyframes wave {
+    0%, 100% { height: 20%; }
+    50% { height: 100%; }
+}
+        :root {
+            --c-red: #8E354A;       /* 宫墙红 */
+            --c-ink: #2C2C2C;       /* 徽墨 */
+            --c-gray: #5e616d;      /* 瓦灰 */
+            --c-paper: #F3F1E8;     /* 宣纸白 */
+            --c-gold: #B59868;      /* 鎏金 */
+            
+            --f-title: 'Ma Shan Zheng', cursive;
+            --f-body: 'Noto Serif SC', serif;
+            
+            --nav-height: 80px;
+        }
+
+        * { box-sizing: border-box; margin: 0; padding: 0; }
+        
+        body {
+            background-color: var(--c-paper);
+            color: var(--c-ink);
+            font-family: var(--f-body);
+            overflow-x: hidden;
+            /* 纸张纹理 */
+            background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noiseFilter'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.65' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noiseFilter)' opacity='0.05'/%3E%3C/svg%3E");
+        }
+
+        /* --- 【核心修改】单独设立的图片类 --- */
+        .project-img {
+            width: 100%;
+            height: 500px;          /* 统一高度，保持整齐 */
+            object-fit: cover;      /* 智能裁剪，防止变形 */
+            border-radius: 4px;     /* 微圆角 */
+            box-shadow: 20px 20px 0px rgba(0,0,0,0.05); /* 新中式阴影 */
+            transition: transform 0.8s ease, filter 0.5s ease;
+            filter: sepia(0.1);     /* 轻微复古滤镜 */
+        }
+
+        /* 鼠标悬停时的图片动效 */
+        .article-block:hover .project-img {
+            transform: scale(1.02);
+            filter: sepia(0);
+        }
+
+        /* --- 0. 开场动画 --- */
+        #intro-overlay {
+            position: fixed; inset: 0; z-index: 9999;
+            background: var(--c-ink); color: var(--c-paper);
+            display: flex; flex-direction: column; align-items: center; justify-content: center;
+            transition: opacity 1s ease, visibility 1s;
+        }
+        .intro-text { font-family: var(--f-title); font-size: 3.5rem; writing-mode: vertical-rl; letter-spacing: 0.5rem; margin-bottom: 40px; }
+        .btn-enter { padding: 12px 40px; border: 1px solid var(--c-paper); background: transparent; color: var(--c-paper); cursor: pointer; font-family: var(--f-body); letter-spacing: 2px; transition: 0.4s; font-size: 1.1rem; }
+        .btn-enter:hover { background: var(--c-paper); color: var(--c-ink); box-shadow: 0 0 20px rgba(255,255,255,0.3); }
+
+        /* --- 1. 导航栏 --- */
+        nav {
+            position: fixed; top: 0; width: 100%; height: var(--nav-height);
+            background: rgba(243, 241, 232, 0.95); backdrop-filter: blur(10px);
+            border-bottom: 1px solid rgba(0,0,0,0.05); z-index: 1000;
+            display: flex; justify-content: space-between; align-items: center;
+            padding: 0 40px; transition: all 0.3s;
+        }
+        .logo { font-family: var(--f-title); font-size: 2rem; color: var(--c-red); text-decoration: none; }
+        .menu { display: flex; gap: 40px; height: 100%; align-items: center; }
+        .menu-item { position: relative; height: 100%; display: flex; align-items: center; cursor: pointer; font-size: 1rem; color: var(--c-ink); text-decoration: none; transition: 0.3s; }
+        .menu-item:hover { color: var(--c-red); }
+        
+        /* 二级菜单 */
+        .dropdown {
+            position: absolute; top: var(--nav-height); left: 50%; transform: translateX(-50%);
+            background: #fff; box-shadow: 0 10px 30px rgba(0,0,0,0.1);
+            padding: 20px 0; min-width: 180px; opacity: 0; visibility: hidden;
+            transition: all 0.3s ease; border-top: 3px solid var(--c-red);
+        }
+        .menu-item:hover .dropdown { opacity: 1; visibility: visible; top: var(--nav-height); }
+        .dropdown a { display: block; padding: 12px 30px; color: #666; text-decoration: none; font-size: 0.95rem; transition: 0.2s; white-space: nowrap; }
+        .dropdown a:hover { background: var(--c-paper); color: var(--c-red); padding-left: 35px; }
+
+        /* --- 4. 路线布局 --- */
+        .route-container { max-width: 1000px; margin: 150px auto; padding: 0 24px; }
+        .route-header { text-align: center; margin-bottom: 80px; position: relative; }
+        .route-header h2 { font-size: 3.5rem; color: var(--c-red); margin-bottom: 10px; }
+        .route-header span { font-size: 1rem; letter-spacing: 4px; color: var(--c-gray); text-transform: uppercase; }
+        
+        .article-block { display: grid; grid-template-columns: 1fr 1fr; gap: 60px; margin-bottom: 100px; align-items: center; }
+        .article-block.reverse { direction: rtl; }
+        .article-block.reverse .text-wrap { direction: ltr; }
+        
+        .text-wrap h3 { font-size: 1.8rem; margin-bottom: 20px; color: var(--c-ink); border-left: 4px solid var(--c-gold); padding-left: 15px; }
+        .text-wrap p { line-height: 1.8; margin-bottom: 20px; text-align: justify; font-size: 1.05rem; }
+        .text-wrap .drop-cap { float: left; font-size: 3.5rem; line-height: 0.8; padding-right: 10px; color: var(--c-red); font-family: var(--f-title); }
+        
+        .img-wrap { overflow: hidden; border-radius: 4px; } /* 包裹层 */
+
+        /* --- 任务卡 --- */
+        .task-box {
+            background: #222; color: #f3f1e8; padding: 40px; margin: 60px 0;
+            text-align: center; border: 1px solid var(--c-gold); position: relative;
+            background-image: url("data:image/svg+xml,%3Csvg width='20' height='20' viewBox='0 0 20 20' xmlns='http://www.w3.org/2000/svg'%3E%3Ccircle cx='2' cy='2' r='1' fill='%23B59868' fill-opacity='0.2'/%3E%3C/svg%3E");
+        }
+        .task-title { color: var(--c-gold); font-family: var(--f-title); font-size: 1.5rem; margin-bottom: 20px; }
+        .task-content { font-size: 1.2rem; min-height: 60px; display: flex; align-items: center; justify-content: center; font-style: italic; transition: opacity 0.3s; }
+        .btn-task { margin-top: 20px; padding: 10px 30px; background: var(--c-red); border: none; color: white; cursor: pointer; font-family: var(--f-body); font-size: 1rem; }
+        .btn-task:hover { background: #fff; color: var(--c-red); }
+
+        /* Footer */
+        footer { background: var(--c-ink); color: #888; padding: 80px 0; text-align: center; }
+        .share-btn { padding: 15px 50px; background: transparent; border: 1px solid #666; color: #fff; font-size: 1rem; cursor: pointer; transition: 0.3s; }
+        .share-btn:hover { background: var(--c-gold); border-color: var(--c-gold); color: #000; }
+
+        /* 动画 */
+        @keyframes pulse { 0% { opacity: 0.8; transform: scale(1); } 100% { opacity: 0; transform: scale(3); } }
+        .reveal { opacity: 0; transform: translateY(30px); transition: all 0.8s ease; }
+        .reveal.active { opacity: 1; transform: translateY(0); }
+
+        @media (max-width: 768px) {
+            .hero-title { font-size: 3rem; }
+            .article-block, .article-block.reverse { grid-template-columns: 1fr; direction: ltr; }
+            .project-img { height: 300px; }
+            .menu { display: none; }
+        }
+    </style>
+</head>
+<body>
+
+    <nav>
+        <a href="index.html" class="logo">
+            <img src="image/logo.png" alt="北平风物记" style="width: 40px; height: 40px; object-fit: contain;">
+            <span style="margin-left: 10px; font-family: var(--f-title); font-size: 1.5rem; color: var(--c-red);">北平风物记</span>
+        </a>
+        <div class="menu">
+            <a href="index.html" class="menu-item">首页</a>
+            <a href="map.html" class="menu-item">漫游地图</a>
+            <div class="menu-item">
+                路线策展
+                <div class="dropdown">
+                    <a href="literature-route.html">文学与光阴</a>
+                    <a href="jiangnan-route.html">北平江南</a>
+                    <a href="ditan-route.html">与地坛同呼吸</a>
+                </div>
+            </div>
+            <a href="about.html" class="menu-item">关于我们</a>
+        </div>
+    </nav>
+
+    <section id="jiangnan-route" class="route-container">
+       <div class="route-header reveal">
+    <span>ROUTE 02</span>
+    <h2>北京的江南烟雨</h2>
+    <p>一座皇家园林的南渡梦影</p>
+    
+    <div class="audio-wrapper">
+        <button class="ambient-btn" onclick="toggleSound('audio-rain', this)">
+            <div class="sound-wave">
+                <div class="bar"></div><div class="bar"></div><div class="bar"></div><div class="bar"></div>
+            </div>
+            <span>沉浸 · 听雨</span>
+        </button>
+        <audio id="audio-rain" loop src="audio/rain.mp3"></audio>
+    </div>
+</div>
+
+        <div class="article-block reveal">
+            <div class="text-wrap">
+                <h3>序章：一场精心策划的“地理错位”</h3>
+                <p><span class="drop-cap">踏</span>入紫竹院，你首先感到的是一种讶异——这里是北京，还是苏州？</p>
+                <p>这座园林的底片，本就来自江南。行走其间，你将完成一场幻觉实验：北方雄浑的骨架（古都）披上了江南秀美的肌理（园林）。</p>
+            </div>
+            <div class="img-wrap">
+                <img src="image/jiangnan-entrance-01.png" class="project-img" alt="紫竹院入口">
+            </div>
+        </div>
+
+        <div class="task-box reveal">
+            <div class="task-title">✉️ 漫步任务 · 画意</div>
+            <div class="task-content" id="task-text-2">"点击按钮，寻找你的画中境"</div>
+            <button class="btn-task" onclick="cycleTask(2)">抽取任务</button>
+        </div>
+
+        <!-- 诗句拼图游戏 -->
+        <div class="task-box reveal">
+            <div class="task-title">🎮 互动游戏 · 江南诗句拼图</div>
+            <div id="poem-game" style="margin: 20px 0;">
+                <div id="poem-pieces" style="display: flex; flex-wrap: wrap; gap: 10px; justify-content: center; margin-bottom: 20px;"></div>
+                <div id="poem-feedback" style="color: var(--c-gold); font-size: 1.1rem; margin: 15px 0;"></div>
+                <button class="btn-task" onclick="resetPoemGame()">重新开始</button>
+            </div>
+        </div>
+
+        <div class="article-block reverse reveal">
+            <div class="text-wrap">
+                <h3>翠池与问月</h3>
+                <p>紫竹院以竹为名。这一池被竹环绕的碧水，宛如一方巨大的天然砚台，将天光云影、风吟鸟语都研成了墨。</p>
+                <p>沿水北行，登临问月楼。在楼下，你“人在画中游”；在楼上，你成了“画外观画人”。</p>
+            </div>
+            <div class="img-wrap">
+                <img src="image/wenyuelou.png" class="project-img" alt="问月楼">
+            </div>
+        </div>
+
+        <div class="article-block reveal">
+            <div class="text-wrap">
+                <h3>竹影与诗魂</h3>
+                <p><span class="drop-cap">竹</span>是江南园林的灵魂，也是文人精神的象征。紫竹院的竹林，并非简单的植物景观，而是一种文化符号的延续。</p>
+                <p>漫步于竹林小径，你可以感受到一种超越时空的宁静。这里的每一根竹子，都仿佛在诉说着文人墨客的雅致情怀，传递着江南文化的细腻与深邃。</p>
+            </div>
+            <div class="img-wrap">
+                <img src="image/jiangnan-bamboo-01.jpg" class="project-img" alt="江南竹林">
+            </div>
+        </div>
+
+        <div class="article-block reverse reveal">
+            <div class="text-wrap">
+                <h3>亭台水榭</h3>
+                <p>江南园林中的亭子，是诗意的象征。它们点缀在山水之间，为游人提供了驻足观赏的绝佳地点。</p>
+                <p>紫竹院的这座六角亭，与周围的湖水、竹林相映成趣，构成了一幅典型的江南水墨画卷。</p>
+            </div>
+            <div class="img-wrap">
+                <img src="image/zizhuyuan-pavilion.jpg" class="project-img" alt="紫竹院亭子">
+            </div>
+        </div>
+
+        <div class="article-block reverse reveal">
+            <div class="text-wrap">
+                <h3>江南元素的北方演绎</h3>
+                <p>北京的江南园林，是一种巧妙的文化融合。在这里，你可以看到江南园林的精致与北方园林的大气完美结合。</p>
+                <p>小桥流水、亭台楼阁，这些江南元素在北京的土地上，被赋予了新的意义和生命力。它们不仅是景观，更是两种文化碰撞与融合的见证。</p>
+            </div>
+            <div class="img-wrap">
+                <img src="image/jiangnan-landscape-02.jpg" class="project-img" alt="江南园林全景">
+            </div>
+        </div>
+    </section>
+
+    <footer id="footer">
+        <h3>北平风物记</h3>
+        <p style="margin-bottom: 30px;">一座城市的记忆重构</p>
+        <button class="share-btn" onclick="alert('📸 海报生成中...\n(请自行放入 haibao.png 到 image 文件夹来实现真正的弹窗)')">
+            生成我的漫游海报
+        </button>
+        <p style="margin-top: 60px; font-size: 0.8rem; opacity: 0.5;">&copy; 2026 北平风物记</p>
+    </footer>
+
+    <script>
+        // 滚动显现
+        const observer = new IntersectionObserver((entries) => {
+            entries.forEach(entry => {
+                if (entry.isIntersecting) entry.target.classList.add('active');
+            });
+        }, { threshold: 0.1 });
+        document.querySelectorAll('.reveal').forEach(el => observer.observe(el));
+
+        // 任务卡
+        const tasks = {
+            1: ["找一本出版年份早于你出生年份的北京地图。", "发现一件与你姓氏相关的北京老地名。", "问掌柜关于古塔的故事。"],
+            2: ["找一幅描绘雨中山水的画作。", "寻找画意与真境交汇的瞬间。", "拍摄一个构图像极了古画的局部。"],
+            3: ["在方泽坛静默五分钟，只听风声。", "记下此刻脑中盘旋的一个问题。", "思考这个空间如何成为心理咨询室。"]
+        };
+
+        function cycleTask(id) {
+            const textEl = document.getElementById(`task-text-${id}`);
+            const list = tasks[id];
+            textEl.style.opacity = 0;
+            setTimeout(() => {
+                textEl.innerText = `“${list[Math.floor(Math.random() * list.length)]}”`;
+                textEl.style.opacity = 1;
+            }, 300);
+        }
+        // --- 诗句拼图游戏 ---
+        const poems = [
+            { id: 1, title: "江南春", author: "杜牧", content: ["千里莺啼绿映红", "水村山郭酒旗风", "南朝四百八十寺", "多少楼台烟雨中"] },
+            { id: 2, title: "泊秦淮", author: "杜牧", content: ["烟笼寒水月笼沙", "夜泊秦淮近酒家", "商女不知亡国恨", "隔江犹唱后庭花"] }
+        ];
+        let currentPoem = null;
+        let selectedPieces = [];
+
+        // 初始化游戏
+        function initPoemGame() {
+            const poemPieces = document.getElementById('poem-pieces');
+            if (!poemPieces) return;
+            
+            // 随机选择一首诗
+            currentPoem = poems[Math.floor(Math.random() * poems.length)];
+            selectedPieces = [];
+            
+            // 打乱诗句顺序
+            const shuffled = [...currentPoem.content].sort(() => Math.random() - 0.5);
+            
+            // 创建诗句块
+            poemPieces.innerHTML = '';
+            shuffled.forEach((line, index) => {
+                const piece = document.createElement('div');
+                piece.textContent = line;
+                piece.className = 'poem-piece';
+                piece.dataset.index = index;
+                piece.style = `
+                    padding: 15px 25px;
+                    background: rgba(255, 255, 255, 0.2);
+                    border: 1px solid var(--c-gold);
+                    border-radius: 4px;
+                    cursor: pointer;
+                    font-family: var(--f-body);
+                    font-size: 1.1rem;
+                    transition: all 0.3s ease;
+                    user-select: none;
+                `;
+                piece.addEventListener('click', () => selectPoemPiece(line));
+                piece.addEventListener('mouseenter', () => {
+                    piece.style.background = 'rgba(255, 255, 255, 0.4)';
+                    piece.style.transform = 'scale(1.05)';
+                });
+                piece.addEventListener('mouseleave', () => {
+                    piece.style.background = 'rgba(255, 255, 255, 0.2)';
+                    piece.style.transform = 'scale(1)';
+                });
+                poemPieces.appendChild(piece);
+            });
+            
+            document.getElementById('poem-feedback').textContent = '';
+        }
+
+        // 选择诗句块
+        function selectPoemPiece(line) {
+            const feedback = document.getElementById('poem-feedback');
+            
+            // 防止重复选择
+            if (selectedPieces.includes(line)) {
+                feedback.textContent = '这句诗已经选过了哦~';
+                return;
+            }
+            
+            selectedPieces.push(line);
+            feedback.textContent = selectedPieces.join('，');
+            
+            // 检查是否完成
+            if (selectedPieces.length === currentPoem.content.length) {
+                checkPoemAnswer();
+            }
+        }
+
+        // 检查答案
+        function checkPoemAnswer() {
+            const feedback = document.getElementById('poem-feedback');
+            const isCorrect = JSON.stringify(selectedPieces) === JSON.stringify(currentPoem.content);
+            
+            if (isCorrect) {
+                feedback.textContent = `🎉 恭喜你拼对了！\n《${currentPoem.title}》 - ${currentPoem.author}`;
+            } else {
+                feedback.textContent = '😊 再试一次，诗句顺序还可以更完美哦~';
+            }
+        }
+
+        // 重置游戏
+        function resetPoemGame() {
+            initPoemGame();
+        }
+
+        // 页面加载时初始化游戏
+        window.addEventListener('load', initPoemGame);
+
+        // --- 音频控制逻辑 ---
+function toggleSound(audioId, btnElement) {
+    const audio = document.getElementById(audioId);
+    
+    // 1. 如果当前正在播放，则暂停
+    if (!audio.paused) {
+        audio.pause();
+        btnElement.classList.remove('playing');
+        btnElement.querySelector('span').innerText = btnElement.querySelector('span').innerText.replace('暂停', '沉浸');
+        return;
+    }
+
+    // 2. 如果当前是暂停状态，先停止所有其他音频（互斥播放）
+    document.querySelectorAll('audio').forEach(a => {
+        a.pause();
+        a.currentTime = 0; // 可选：重置进度
+    });
+    document.querySelectorAll('.ambient-btn').forEach(btn => {
+        btn.classList.remove('playing');
+        //不仅重置样式，文字也建议复原，这里简单处理
+    });
+
+    // 3. 播放当前选中的音频
+    audio.play();
+    btnElement.classList.add('playing');
+    
+    // 4. (可选) 修改按钮文字提示状态
+    const textSpan = btnElement.querySelector('span');
+    // 如果想让文字变成"暂停"，可以把下面注释打开
+    // textSpan.innerText = textSpan.innerText.replace('沉浸', '暂停'); 
+}
+    </script>
+</body>
+</html>
