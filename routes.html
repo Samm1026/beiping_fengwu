@@ -17,6 +17,49 @@
             --f-body: 'Noto Serif SC', serif;
         }
 
+        /* 夜间模式变量 */
+        [data-theme="dark"] {
+            --c-red: #B84A62;       /* 宫墙红（亮） */
+            --c-ink: #E8E6DC;       /* 宣纸白 */
+            --c-gray: #A8AAAD;      /* 浅灰 */
+            --c-paper: #1A1A1A;     /* 深墨色 */
+            --c-gold: #D4B078;      /* 鎏金（亮） */
+        }
+
+        /* 夜间模式下的卡片和容器调整 */
+        [data-theme="dark"] .route-card,
+        [data-theme="dark"] .concept-card,
+        [data-theme="dark"] .memory-item,
+        [data-theme="dark"] .voice-guide,
+        [data-theme="dark"] .virtual-tour,
+        [data-theme="dark"] .stamp-item,
+        [data-theme="dark"] .user-reviews,
+        [data-theme="dark"] .transport-guide,
+        [data-theme="dark"] .map-card {
+            background: rgba(30, 30, 30, 0.8);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
+        /* 夜间模式下的导航栏调整 */
+        [data-theme="dark"] nav {
+            background: rgba(26, 26, 26, 0.95);
+            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
+        /* 夜间模式下的下拉菜单调整 */
+        [data-theme="dark"] .dropdown {
+            background: rgba(30, 30, 30, 0.98);
+            border-top: 3px solid var(--c-red);
+        }
+
+        [data-theme="dark"] .dropdown a {
+            color: var(--c-gray);
+        }
+
+        [data-theme="dark"] .dropdown a:hover {
+            background: rgba(40, 40, 40, 0.8);
+        }
+
         * {
             margin: 0;
             padding: 0;
@@ -242,6 +285,111 @@
         .stamp-item.collected .stamp-status {
             color: var(--c-red);
             font-weight: bold;
+        }
+        
+        /* 路线卡片悬停效果增强 */
+        .route-card:hover .route-image {
+            transform: scale(1.05);
+            transition: transform 0.5s ease;
+        }
+        
+        /* 添加路线评分系统 */
+        .route-rating {
+            margin: 20px 0;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+        
+        .stars {
+            display: flex;
+            gap: 5px;
+        }
+        
+        .star {
+            font-size: 1.2rem;
+            color: var(--c-gold);
+        }
+        
+        /* 添加路线难度标识 */
+        .route-difficulty {
+            display: inline-block;
+            padding: 5px 12px;
+            background: var(--c-paper);
+            border-radius: 15px;
+            font-size: 0.85rem;
+            margin-left: 10px;
+        }
+        
+        /* 添加季节推荐标签 */
+        .season-tags {
+            margin: 20px 0;
+            display: flex;
+            gap: 8px;
+            flex-wrap: wrap;
+        }
+        
+        .season-tag {
+            padding: 6px 12px;
+            background: var(--c-paper);
+            border-radius: 12px;
+            font-size: 0.8rem;
+            color: var(--c-gray);
+        }
+        
+        /* 添加用户评价卡片 */
+        .user-reviews {
+            margin: 40px 0;
+            padding: 20px;
+            background: var(--c-paper);
+            border-radius: 8px;
+        }
+        
+        .reviews-title {
+            font-size: 1.2rem;
+            margin-bottom: 20px;
+            color: var(--c-ink);
+        }
+        
+        .review-item {
+            display: flex;
+            gap: 15px;
+            margin-bottom: 20px;
+            padding-bottom: 20px;
+            border-bottom: 1px solid rgba(0,0,0,0.05);
+        }
+        
+        .review-item:last-child {
+            margin-bottom: 0;
+            padding-bottom: 0;
+            border-bottom: none;
+        }
+        
+        .review-avatar {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            background: var(--c-red);
+            color: white;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: bold;
+            flex-shrink: 0;
+        }
+        
+        .review-content {
+            flex: 1;
+        }
+        
+        .review-author {
+            font-weight: bold;
+            margin-bottom: 5px;
+        }
+        
+        .review-text {
+            font-size: 0.9rem;
+            color: var(--c-gray);
         }
         
         .stamp-progress {
@@ -605,16 +753,16 @@
         }
 
         /* 使用本地图片 */
-        #literature-route .route-image {
-            background-image: url('image/wansongta.png');
+        #literature-details .route-image {
+            background-image: url('image/wenxue.jpg');
         }
 
-        #jiangnan-route .route-image {
-            background-image: url('image/jiangnan-bamboo-01.jpg');
+        #jiangnan-details .route-image {
+            background-image: url('image/jiangnan.jpg');
         }
 
-        #ditan-route .route-image {
-            background-image: url('image/ditan-courtyard-03.jpg');
+        #ditan-details .route-image {
+            background-image: url('image/ditan.jpg');
         }
 
         /* 路线编号 */
@@ -694,6 +842,10 @@
             text-decoration: none;
             transition: all 0.3s ease;
             font-weight: bold;
+            font-family: var(--f-body);
+            font-size: 1rem;
+            border: none;
+            cursor: pointer;
         }
 
         .view-btn:hover {
@@ -789,6 +941,10 @@
             </div>
             <a href="about.html" class="menu-item">关于我们</a>
         </div>
+        <!-- 夜间模式切换 -->
+        <button id="theme-toggle" class="theme-toggle" style="background: none; border: none; cursor: pointer; font-size: 1.2rem; color: var(--c-ink); padding: 8px; transition: all 0.3s ease;">
+            🌙
+        </button>
     </nav>
 
     <section class="routes-section">
@@ -801,17 +957,17 @@
                 <h2 style="font-family: var(--f-title); font-size: 3rem; color: var(--c-red); margin-bottom: 40px;">城市记忆</h2>
                 <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 30px; margin-bottom: 60px;">
                     <div class="memory-item" style="cursor: pointer; transition: transform 0.3s ease; background: white; padding: 20px; border-radius: 8px; box-shadow: 0 10px 30px rgba(0,0,0,0.05);">
-                        <img src="image/wansongta.png" alt="万松老人塔" style="width: 100%; height: 200px; object-fit: cover; border-radius: 4px; margin-bottom: 20px;">
+                        <img src="image/wenxue.jpg" alt="文学与光阴" style="width: 100%; height: 200px; object-fit: cover; border-radius: 4px; margin-bottom: 20px;"><img src="image/wansongta.png" alt="万松老人塔" style="width: 48%; height: 150px; object-fit: cover; border-radius: 4px; margin-bottom: 20px; margin-right: 4%;"><img src="image/zhengyangshuju.png" alt="正阳书局" style="width: 48%; height: 150px; object-fit: cover; border-radius: 4px; margin-bottom: 20px;">
                         <h3 style="font-size: 1.4rem; color: var(--c-ink); margin-bottom: 10px;">文学与光阴的交错</h3>
                         <p style="color: var(--c-gray); line-height: 1.6;">从古塔到藏书楼的北平三重时间，探索北京的文学与历史记忆，感受时间的流转与文明的传承。</p>
                     </div>
                     <div class="memory-item" style="cursor: pointer; transition: transform 0.3s ease; background: white; padding: 20px; border-radius: 8px; box-shadow: 0 10px 30px rgba(0,0,0,0.05);">
-                        <img src="image/jiangnan-bamboo-01.jpg" alt="北平江南" style="width: 100%; height: 200px; object-fit: cover; border-radius: 4px; margin-bottom: 20px;">
+                        <img src="image/jiangnan.jpg" alt="北平江南" style="width: 100%; height: 200px; object-fit: cover; border-radius: 4px; margin-bottom: 20px;"><img src="image/jiangnan-bamboo-01.jpg" alt="竹林景观" style="width: 48%; height: 150px; object-fit: cover; border-radius: 4px; margin-bottom: 20px; margin-right: 4%;"><img src="image/jiangnan-entrance-01.png" alt="入口景观" style="width: 48%; height: 150px; object-fit: cover; border-radius: 4px; margin-bottom: 20px;">
                         <h3 style="font-size: 1.4rem; color: var(--c-ink); margin-bottom: 10px;">北京的江南烟雨</h3>
                         <p style="color: var(--c-gray); line-height: 1.6;">体验北方的江南水乡风情，在紫竹院中感受皇家园林的南渡梦影，探索友贤山馆、翠池等景点。</p>
                     </div>
                     <div class="memory-item" style="cursor: pointer; transition: transform 0.3s ease; background: white; padding: 20px; border-radius: 8px; box-shadow: 0 10px 30px rgba(0,0,0,0.05);">
-                        <img src="image/ditan-courtyard-03.jpg" alt="与地坛同呼吸" style="width: 100%; height: 200px; object-fit: cover; border-radius: 4px; margin-bottom: 20px;">
+                        <img src="image/ditan.jpg" alt="与地坛同呼吸" style="width: 100%; height: 200px; object-fit: cover; border-radius: 4px; margin-bottom: 20px;"><img src="image/ditan-gate-01.png" alt="地坛大门" style="width: 48%; height: 150px; object-fit: cover; border-radius: 4px; margin-bottom: 20px; margin-right: 4%;"><img src="image/ditan-oldtree-02.jpg" alt="古柏景观" style="width: 48%; height: 150px; object-fit: cover; border-radius: 4px; margin-bottom: 20px;">
                         <h3 style="font-size: 1.4rem; color: var(--c-ink); margin-bottom: 10px;">与地坛同呼吸</h3>
                         <p style="color: var(--c-gray); line-height: 1.6;">跟随史铁生的脚步探索地坛的文学与生命意义，在寂静中听见生命的回响，感受生命的沉思与力量。</p>
                     </div>
@@ -867,7 +1023,6 @@
                     </div>
                     
                     <div style="text-align: center; margin-top: 40px;">
-                        <button class="collect-all-btn" onclick="collectAllStamps()">一键收集所有印章</button>
                         <p style="margin-top: 20px; color: var(--c-gray); font-size: 0.9rem;">探索不同路线，收集更多印章吧！</p>
                     </div>
                 </div>
@@ -884,12 +1039,31 @@
                     <div class="route-content">
                         <h3 class="route-title">文学与光阴的交错</h3>
                         <p class="route-subtitle">从古塔到藏书楼的北平三重时间</p>
-                        <span class="route-duration">2-3小时</span>
+                        <div style="display: flex; align-items: center; gap: 20px; margin-bottom: 20px;">
+                            <span class="route-duration">2-3小时</span>
+                            <div style="flex: 1; height: 1px; background: var(--c-gray); opacity: 0.3;"></div>
+                            <span style="color: var(--c-gold); font-weight: bold;">📚 文学之旅</span>
+                        </div>
                         <p class="route-description">探索北京的文学与历史记忆，从万松老人塔到正阳书局，再到红楼藏书楼，感受时间的流转与文明的传承。</p>
                         <div class="route-highlights">
                             <span class="highlight-tag">万松老人塔</span>
                             <span class="highlight-tag">正阳书局</span>
                             <span class="highlight-tag">红楼藏书楼</span>
+                        </div>
+                        <!-- 添加路线特色标签 -->
+                        <div style="margin: 25px 0; display: flex; flex-wrap: wrap; gap: 10px;">
+                            <div style="display: flex; align-items: center; gap: 8px; padding: 8px 16px; background: var(--c-paper); border-radius: 20px; font-size: 0.9rem;">
+                                <span>🌟</span>
+                                <span>文化深度</span>
+                            </div>
+                            <div style="display: flex; align-items: center; gap: 8px; padding: 8px 16px; background: var(--c-paper); border-radius: 20px; font-size: 0.9rem;">
+                                <span>📖</span>
+                                <span>文学氛围</span>
+                            </div>
+                            <div style="display: flex; align-items: center; gap: 8px; padding: 8px 16px; background: var(--c-paper); border-radius: 20px; font-size: 0.9rem;">
+                                <span>🕰️</span>
+                                <span>历史悠久</span>
+                            </div>
                         </div>
                         
                         <!-- AI语音导游 -->
@@ -974,13 +1148,32 @@
                     <div class="route-content">
                         <h3 class="route-title">北京的江南烟雨</h3>
                         <p class="route-subtitle">一座皇家园林的南渡梦影</p>
-                        <span class="route-duration">3-4小时</span>
+                        <div style="display: flex; align-items: center; gap: 20px; margin-bottom: 20px;">
+                            <span class="route-duration">3-4小时</span>
+                            <div style="flex: 1; height: 1px; background: var(--c-gray); opacity: 0.3;"></div>
+                            <span style="color: var(--c-gold); font-weight: bold;">🌧️ 江南风情</span>
+                        </div>
                         <p class="route-description">体验北方的江南水乡风情，在紫竹院中感受皇家园林的南渡梦影，探索友贤山馆、翠池、问月楼等景点。</p>
                         <div class="route-highlights">
                             <span class="highlight-tag">友贤山馆</span>
                             <span class="highlight-tag">翠池</span>
                             <span class="highlight-tag">问月楼</span>
                             <span class="highlight-tag">紫御湾码头</span>
+                        </div>
+                        <!-- 添加路线特色标签 -->
+                        <div style="margin: 25px 0; display: flex; flex-wrap: wrap; gap: 10px;">
+                            <div style="display: flex; align-items: center; gap: 8px; padding: 8px 16px; background: var(--c-paper); border-radius: 20px; font-size: 0.9rem;">
+                                <span>🌟</span>
+                                <span>江南韵味</span>
+                            </div>
+                            <div style="display: flex; align-items: center; gap: 8px; padding: 8px 16px; background: var(--c-paper); border-radius: 20px; font-size: 0.9rem;">
+                                <span>🎋</span>
+                                <span>竹林景观</span>
+                            </div>
+                            <div style="display: flex; align-items: center; gap: 8px; padding: 8px 16px; background: var(--c-paper); border-radius: 20px; font-size: 0.9rem;">
+                                <span>🏞️</span>
+                                <span>山水园林</span>
+                            </div>
                         </div>
                         
                         <!-- AI语音导游 -->
@@ -1027,13 +1220,32 @@
                     <div class="route-content">
                         <h3 class="route-title">与地坛同呼吸</h3>
                         <p class="route-subtitle">在寂静中，听见生命的回响</p>
-                        <span class="route-duration">2-3小时</span>
+                        <div style="display: flex; align-items: center; gap: 20px; margin-bottom: 20px;">
+                            <span class="route-duration">2-3小时</span>
+                            <div style="flex: 1; height: 1px; background: var(--c-gray); opacity: 0.3;"></div>
+                            <span style="color: var(--c-gold); font-weight: bold;">🌳 生命沉思</span>
+                        </div>
                         <p class="route-description">跟随史铁生的脚步探索地坛的文学与生命意义，在方泽坛、古柏区、神库等地感受生命的沉思与力量。</p>
                         <div class="route-highlights">
                             <span class="highlight-tag">方泽坛</span>
                             <span class="highlight-tag">古柏区</span>
                             <span class="highlight-tag">神库</span>
                             <span class="highlight-tag">我与地坛书店</span>
+                        </div>
+                        <!-- 添加路线特色标签 -->
+                        <div style="margin: 25px 0; display: flex; flex-wrap: wrap; gap: 10px;">
+                            <div style="display: flex; align-items: center; gap: 8px; padding: 8px 16px; background: var(--c-paper); border-radius: 20px; font-size: 0.9rem;">
+                                <span>🌟</span>
+                                <span>哲学思考</span>
+                            </div>
+                            <div style="display: flex; align-items: center; gap: 8px; padding: 8px 16px; background: var(--c-paper); border-radius: 20px; font-size: 0.9rem;">
+                                <span>🍂</span>
+                                <span>自然静谧</span>
+                            </div>
+                            <div style="display: flex; align-items: center; gap: 8px; padding: 8px 16px; background: var(--c-paper); border-radius: 20px; font-size: 0.9rem;">
+                                <span>📚</span>
+                                <span>文学圣地</span>
+                            </div>
                         </div>
                         
                         <!-- AI语音导游 -->
@@ -1158,6 +1370,10 @@
                         if (stamps[stampId]) {
                             item.classList.add('collected');
                             item.querySelector('.stamp-status').textContent = '已收集';
+                        } else {
+                            // 确保未收集的印章显示为未收集状态
+                            item.classList.remove('collected');
+                            item.querySelector('.stamp-status').textContent = '未收集';
                         }
                     });
                     
@@ -1202,16 +1418,7 @@
                     updateStampProgress();
                 }
                 
-                // 一键收集所有印章
-                function collectAllStamps() {
-                    const stampIds = ['literature', 'jiangnan', 'ditan', 'explorer', 'heritage'];
-                    stampIds.forEach(stampId => {
-                        collectStamp(stampId);
-                    });
-                    
-                    // 显示成功提示
-                    alert('恭喜你收集了所有印章！');
-                }
+
                 
                 // 更新集章进度
                 function updateStampProgress() {
@@ -1590,27 +1797,63 @@
                         quizModal.style.display = 'none';
                     });
                     
-                    // 文化知识题库
-                    const quizQuestions = [
-                        {
-                            question: '万松老人塔是为了纪念哪位历史人物而建？',
-                            options: ['万松行秀', '乾隆皇帝', '纳兰性德', '曹雪芹'],
-                            correct: 0
-                        },
-                        {
-                            question: '《我与地坛》的作者是谁？',
-                            options: ['史铁生', '鲁迅', '老舍', '朱自清'],
-                            correct: 0
-                        },
-                        {
-                            question: '紫竹院公园的"紫竹"得名于哪种植物？',
-                            options: ['紫竹', '青竹', '毛竹', '刚竹'],
-                            correct: 0
-                        }
-                    ];
+                    // 文化知识题库 - 按景点分类
+                    const quizQuestionsBySpot = {
+                        'literature': [
+                            {
+                                question: '万松老人塔是为了纪念哪位历史人物而建？',
+                                options: ['A. 万松行秀', 'B. 乾隆皇帝', 'C. 纳兰性德', 'D. 曹雪芹'],
+                                correct: 0
+                            },
+                            {
+                                question: '万松老人塔现位于北京西四南大街，其最初的建造年代是？',
+                                options: ['A. 唐代', 'B. 金代', 'C. 元代', 'D. 明代'],
+                                correct: 2
+                            },
+                            {
+                                question: '万松老人塔曾因年久失修损毁，近代对其进行重修并保护的知名人物是？',
+                                options: ['A. 梁思成', 'B. 朱启钤', 'C. 林徽因', 'D. 郭沫若'],
+                                correct: 1
+                            }
+                        ],
+                        'jiangnan': [
+                            {
+                                question: '紫竹院公园以竹景闻名，其建园的核心水系依托于北京哪一处古河道？',
+                                options: ['A. 通惠河', 'B. 莲花河', 'C. 高粱河', 'D. 护城河'],
+                                correct: 2
+                            },
+                            {
+                                question: '紫竹院公园内的"福荫紫竹院"庙宇，最初是为了供奉哪位佛教人物而建？',
+                                options: ['A. 观音菩萨', 'B. 文殊菩萨', 'C. 普贤菩萨', 'D. 地藏菩萨'],
+                                correct: 0
+                            },
+                            {
+                                question: '紫竹院公园的名字由来，与以下哪一历史背景相关？',
+                                options: ['A. 清代宫廷种紫竹祈福', 'B. 明代寺庙旁紫竹成林', 'C. 元代文人在此种竹题诗', 'D. 辽代皇家园林植竹造景'],
+                                correct: 1
+                            }
+                        ],
+                        'ditan': [
+                            {
+                                question: '地坛公园是明清帝王祭祀"皇地祇神"的场所，其与天坛南北对应，地坛祭祀的核心是祈求什么？',
+                                options: ['A. 五谷丰登、土地安宁', 'B. 风调雨顺、国运昌隆', 'C. 子孙绵延、皇室兴旺', 'D. 消灾避祸、百姓安康'],
+                                correct: 0
+                            },
+                            {
+                                question: '地坛公园内的核心建筑方泽坛，其台面铺砌的石块数遵循的是哪种古代数字理念？',
+                                options: ['A. 阴阳五行', 'B. 天圆地方', 'C. 九五之尊', 'D. 四象八卦'],
+                                correct: 1
+                            },
+                            {
+                                question: '史铁生的散文名篇《我与地坛》中，他常去地坛的核心原因是？',
+                                options: ['A. 地坛环境清幽，适合写作创作', 'B. 遭遇人生挫折后，寻求心灵慰藉', 'C. 家住地坛附近，日常散步消遣', 'D. 地坛藏有书籍，便于查阅资料'],
+                                correct: 1
+                            }
+                        ]
+                    };
                     
                     // 显示答题
-                    window.showQuiz = function() {
+                    window.showQuiz = function(spotId = 'literature') {
                         const quizContent = document.getElementById('quiz-content');
                         const quizResult = document.getElementById('quiz-result');
                         const quizSubmit = document.getElementById('quiz-submit');
@@ -1618,6 +1861,9 @@
                         // 重置答题状态
                         quizResult.style.display = 'none';
                         quizSubmit.style.display = 'block';
+                        
+                        // 获取对应景点的题目
+                        const quizQuestions = quizQuestionsBySpot[spotId] || quizQuestionsBySpot['literature'];
                         
                         // 生成题目HTML
                         let quizHTML = '';
@@ -1639,15 +1885,32 @@
                         
                         quizContent.innerHTML = quizHTML;
                         quizModal.style.display = 'flex';
+                        
+                        // 存储当前景点ID，用于提交答案时使用
+                        quizModal.dataset.currentSpot = spotId;
                     };
                     
                     // 提交答案
                     document.getElementById('quiz-submit').addEventListener('click', function() {
+                        const spotId = quizModal.dataset.currentSpot || 'literature';
+                        const quizQuestions = quizQuestionsBySpot[spotId] || quizQuestionsBySpot['literature'];
+                        
                         let correctCount = 0;
+                        let wrongAnswers = [];
+                        
                         quizQuestions.forEach((q, index) => {
                             const selectedOption = document.querySelector(`input[name="quiz-${index}"]:checked`);
-                            if (selectedOption && parseInt(selectedOption.value) === q.correct) {
+                            const selectedValue = selectedOption ? parseInt(selectedOption.value) : -1;
+                            
+                            if (selectedValue === q.correct) {
                                 correctCount++;
+                            } else {
+                                wrongAnswers.push({
+                                    index: index,
+                                    question: q.question,
+                                    selectedAnswer: selectedValue >= 0 ? q.options[selectedValue] : '未作答',
+                                    correctAnswer: q.options[q.correct]
+                                });
                             }
                         });
                         
@@ -1655,7 +1918,7 @@
                         const quizResult = document.getElementById('quiz-result');
                         const quizSubmit = document.getElementById('quiz-submit');
                         
-                        quizResult.innerHTML = `
+                        let resultHTML = `
                             <h4 style="color: var(--c-red); margin-bottom: 15px;">测试结果</h4>
                             <p>你答对了 ${correctCount}/${quizQuestions.length} 道题！</p>
                             ${correctCount === quizQuestions.length ? 
@@ -1663,6 +1926,26 @@
                                 '<p style="color: var(--c-gray);">继续加油，了解更多北平文化！</p>'
                             }
                         `;
+                        
+                        // 添加错误题目及正确答案
+                        if (wrongAnswers.length > 0) {
+                            resultHTML += `
+                                <div style="margin-top: 20px; padding-top: 20px; border-top: 1px solid #eee;">
+                                    <h5 style="color: var(--c-red); margin-bottom: 15px;">错误题目及正确答案：</h5>
+                                    <ul style="list-style: none; padding: 0; margin: 0;">
+                                        ${wrongAnswers.map(item => `
+                                            <li style="margin-bottom: 15px; padding: 10px; background: #f9f9f9; border-radius: 4px;">
+                                                <p style="margin-bottom: 8px;"><strong>${item.index + 1}. ${item.question}</strong></p>
+                                                <p style="margin: 4px 0;">你的答案：<span style="color: #999;">${item.selectedAnswer}</span></p>
+                                                <p style="margin: 4px 0;">正确答案：<span style="color: var(--c-red); font-weight: bold;">${item.correctAnswer}</span></p>
+                                            </li>
+                                        `).join('')}
+                                    </ul>
+                                </div>
+                            `;
+                        }
+                        
+                        quizResult.innerHTML = resultHTML;
                         quizResult.style.display = 'block';
                         quizSubmit.style.display = 'none';
                         
@@ -1675,17 +1958,24 @@
                     // 添加答题按钮到路线详情
                     const addQuizButtons = () => {
                         const routeDetails = document.querySelectorAll('.route-details-section');
-                        routeDetails.forEach(detail => {
+                        routeDetails.forEach((detail, index) => {
                             // 检查是否已经添加了答题按钮
                             if (!detail.querySelector('.quiz-btn')) {
                                 const viewBtn = detail.querySelector('.view-btn');
                                 if (viewBtn) {
                                     const quizBtn = document.createElement('button');
-                                    quizBtn.className = 'view-btn';
+                                    quizBtn.className = 'view-btn quiz-btn';
                                     quizBtn.style.marginLeft = '15px';
                                     quizBtn.style.background = 'var(--c-gold)';
                                     quizBtn.textContent = '文化知识小测试';
-                                    quizBtn.onclick = showQuiz;
+                                    
+                                    // 根据索引传递正确的景点ID
+                                    const spotIds = ['literature', 'jiangnan', 'ditan'];
+                                    const spotId = spotIds[index] || 'literature';
+                                    quizBtn.onclick = function() {
+                                        showQuiz(spotId);
+                                    };
+                                    
                                     viewBtn.parentNode.insertBefore(quizBtn, viewBtn.nextSibling);
                                 }
                             }
@@ -1774,6 +2064,32 @@
                         alert('复制失败，请手动复制链接');
                     });
                 }
+                
+                // 夜间模式切换
+                const themeToggle = document.getElementById('theme-toggle');
+                
+                // 检查本地存储中的主题设置
+                if (localStorage.getItem('theme') === 'dark' || 
+                    (!localStorage.getItem('theme') && window.matchMedia('(prefers-color-scheme: dark)').matches)) {
+                    document.documentElement.setAttribute('data-theme', 'dark');
+                    themeToggle.textContent = '☀️';
+                } else {
+                    document.documentElement.setAttribute('data-theme', 'light');
+                    themeToggle.textContent = '🌙';
+                }
+                
+                // 切换主题
+                themeToggle.addEventListener('click', function() {
+                    if (document.documentElement.getAttribute('data-theme') === 'light') {
+                        document.documentElement.setAttribute('data-theme', 'dark');
+                        localStorage.setItem('theme', 'dark');
+                        themeToggle.textContent = '☀️';
+                    } else {
+                        document.documentElement.setAttribute('data-theme', 'light');
+                        localStorage.setItem('theme', 'light');
+                        themeToggle.textContent = '🌙';
+                    }
+                });
                 
                 // 初始化语音合成和事件监听
                 document.addEventListener('DOMContentLoaded', function() {

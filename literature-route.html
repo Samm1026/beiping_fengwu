@@ -91,6 +91,42 @@
             --nav-height: 80px;
         }
 
+        /* 夜间模式变量 */
+        [data-theme="dark"] {
+            --c-red: #B84A62;       /* 宫墙红（亮） */
+            --c-ink: #E8E6DC;       /* 宣纸白 */
+            --c-gray: #A8AAAD;      /* 浅灰 */
+            --c-paper: #1A1A1A;     /* 深墨色 */
+            --c-gold: #D4B078;      /* 鎏金（亮） */
+        }
+
+        /* 夜间模式下的卡片和容器调整 */
+        [data-theme="dark"] .task-box,
+        [data-theme="dark"] .article-block {
+            background: rgba(30, 30, 30, 0.8);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
+        /* 夜间模式下的导航栏调整 */
+        [data-theme="dark"] nav {
+            background: rgba(26, 26, 26, 0.95);
+            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
+        /* 夜间模式下的下拉菜单调整 */
+        [data-theme="dark"] .dropdown {
+            background: rgba(30, 30, 30, 0.98);
+            border-top: 3px solid var(--c-red);
+        }
+
+        [data-theme="dark"] .dropdown a {
+            color: var(--c-gray);
+        }
+
+        [data-theme="dark"] .dropdown a:hover {
+            background: rgba(40, 40, 40, 0.8);
+        }
+
         * { box-sizing: border-box; margin: 0; padding: 0; }
         
         body {
@@ -153,6 +189,12 @@
         .menu-item:hover .dropdown { opacity: 1; visibility: visible; top: var(--nav-height); }
         .dropdown a { display: block; padding: 12px 30px; color: #666; text-decoration: none; font-size: 0.95rem; transition: 0.2s; white-space: nowrap; }
         .dropdown a:hover { background: var(--c-paper); color: var(--c-red); padding-left: 35px; }
+        
+        /* 主题切换按钮 */
+        .theme-toggle:hover {
+            color: var(--c-red);
+            transform: scale(1.1);
+        }
 
         /* --- 4. 路线布局 --- */
         .route-container { max-width: 1000px; margin: 150px auto; padding: 0 24px; }
@@ -219,15 +261,19 @@
             </div>
             <a href="about.html" class="menu-item">关于我们</a>
         </div>
+        <!-- 主题切换按钮 -->
+        <button id="theme-toggle" class="theme-toggle" style="background: none; border: none; cursor: pointer; font-size: 1.2rem; color: var(--c-ink); padding: 8px; transition: all 0.3s ease;">🌙</button>
     </nav>
 
     <section id="literature-route" class="route-container">
-        <div class="route-header reveal">
-    <span>ROUTE 01</span>
-    <h2>文学与光阴的交错</h2>
-    <p>从古塔到藏书楼的北平三重时间</p>
+        <a href="routes.html" class="back-btn" style="display: inline-block; background: var(--c-paper); color: var(--c-ink); padding: 10px 25px; border-radius: 4px; text-decoration: none; transition: all 0.3s ease; margin-bottom: 0; border: 1px solid #e0ded6; position: relative; z-index: 10;">← 返回城市记忆</a>
+        <div class="route-header reveal" style="background: url('image/wenxue.jpg') center/cover no-repeat; padding: 80px 20px; margin-bottom: 60px; border-radius: 4px; box-shadow: 20px 20px 0px rgba(0,0,0,0.05); position: relative; overflow: hidden;">
+            <div style="position: absolute; inset: 0; background: rgba(0,0,0,0.3); z-index: 1;"></div>
+    <span style="position: relative; z-index: 2; color: white; text-shadow: 0 2px 10px rgba(0,0,0,0.5);">ROUTE 01</span>
+    <h2 style="position: relative; z-index: 2; color: white; text-shadow: 0 2px 10px rgba(0,0,0,0.5);">文学与光阴的交错</h2>
+    <p style="position: relative; z-index: 2; color: white; text-shadow: 0 2px 10px rgba(0,0,0,0.5);">从古塔到藏书楼的北平三重时间</p>
     
-    <div class="audio-wrapper">
+    <div class="audio-wrapper" style="position: relative; z-index: 2;">
         <button class="ambient-btn" onclick="toggleSound('audio-lit', this)">
             <div class="sound-wave">
                 <div class="bar"></div><div class="bar"></div><div class="bar"></div><div class="bar"></div>
@@ -285,7 +331,7 @@
                 <p>从万松老人塔（凝固的时间），到正阳书局（呼吸的时间），再到红楼藏书楼（流动的时间），不到一公里的路线完成了一场精妙的时空折叠。文学是贯穿这三重时间的金线，让每一个地点都充满了精神的温度。</p>
             </div>
             <div class="img-wrap">
-                <img src="image/wenyuelou.png" class="project-img" alt="红楼藏书楼内部">
+                <img src="image/honglouneibu.jpg" class="project-img" alt="红楼藏书楼内部">
             </div>
         </div>
 
@@ -293,20 +339,20 @@
         <div class="article-block reveal" style="margin-top: 100px;">
             <div class="text-wrap" style="grid-column: 1 / -1; text-align: center;">
                 <h3 style="text-align: center; border-left: none; display: inline-block; border-bottom: 4px solid var(--c-gold); padding-bottom: 10px; padding-left: 0;">📚 文学拼图游戏</h3>
-                <p style="margin-top: 30px; font-size: 1.2rem;">将打乱的诗句重新排列，拼出完整的文学经典片段</p>
+                <p style="margin-top: 30px; font-size: 1.2rem; text-align: center;">将打乱的诗句重新排列，拼出完整的文学经典片段</p>
             </div>
         </div>
 
         <div class="article-block reveal" style="margin-bottom: 100px;">
             <div class="text-wrap" style="grid-column: 1 / -1;">
-                <div id="poem-puzzle" style="background: white; padding: 40px; border-radius: 8px; box-shadow: 0 10px 30px rgba(0,0,0,0.05);">
-                    <h4 id="puzzle-title" style="text-align: center; margin-bottom: 20px; color: var(--c-red);"></h4>
+                <div id="poem-puzzle" style="background: var(--c-paper); padding: 40px; border: 1px solid rgba(0,0,0,0.05); box-shadow: 20px 20px 0px rgba(0,0,0,0.05); border-radius: 4px; background-image: url('data:image/svg+xml,%3Csvg viewBox="0 0 200 200" xmlns="http://www.w3.org/2000/svg"%3E%3Cfilter id="noiseFilter"%3E%3CfeTurbulence type="fractalNoise" baseFrequency="0.65" numOctaves="3" stitchTiles="stitch"/%3E%3C/filter%3E%3Crect width="100%25" height="100%25" filter="url(%23noiseFilter)" opacity="0.05"/%3E%3C/svg%3E');">
+                    <h4 id="puzzle-title" style="text-align: center; margin-bottom: 20px; color: var(--c-red); font-family: var(--f-title); font-size: 1.5rem;"></h4>
                     <div id="puzzle-container" style="display: flex; flex-wrap: wrap; gap: 15px; justify-content: center; margin-bottom: 30px;"></div>
-                    <div id="puzzle-answer" style="text-align: center; margin-bottom: 20px; font-style: italic; color: var(--c-gray);"></div>
+                    <div id="puzzle-answer" style="text-align: center; margin-bottom: 20px; font-style: italic; color: var(--c-gray); font-family: var(--f-body); font-size: 1.1rem;"></div>
                     <div style="display: flex; justify-content: center; gap: 20px;">
-                        <button id="start-puzzle" class="btn-task" style="background: var(--c-red); color: white; border: none; padding: 12px 30px; border-radius: 4px; cursor: pointer; transition: all 0.3s ease;">开始游戏</button>
-                        <button id="check-puzzle" class="btn-task" style="background: var(--c-gold); color: white; border: none; padding: 12px 30px; border-radius: 4px; cursor: pointer; transition: all 0.3s ease; display: none;">检查答案</button>
-                        <button id="reset-puzzle" class="btn-task" style="background: var(--c-gray); color: white; border: none; padding: 12px 30px; border-radius: 4px; cursor: pointer; transition: all 0.3s ease; display: none;">重新开始</button>
+                        <button id="start-puzzle" class="btn-task" style="background: var(--c-paper); color: var(--c-ink); border: 1px solid var(--c-red); padding: 12px 30px; border-radius: 4px; cursor: pointer; transition: all 0.3s ease; font-family: var(--f-body); box-shadow: 5px 5px 0px rgba(142, 53, 74, 0.1);">开始游戏</button>
+                        <button id="check-puzzle" class="btn-task" style="background: var(--c-paper); color: var(--c-ink); border: 1px solid var(--c-gold); padding: 12px 30px; border-radius: 4px; cursor: pointer; transition: all 0.3s ease; display: none; font-family: var(--f-body); box-shadow: 5px 5px 0px rgba(181, 152, 104, 0.1);">检查答案</button>
+                        <button id="reset-puzzle" class="btn-task" style="background: var(--c-paper); color: var(--c-ink); border: 1px solid var(--c-gray); padding: 12px 30px; border-radius: 4px; cursor: pointer; transition: all 0.3s ease; display: none; font-family: var(--f-body); box-shadow: 5px 5px 0px rgba(94, 97, 109, 0.1);">重新开始</button>
                     </div>
                 </div>
             </div>
@@ -317,9 +363,12 @@
 
     <footer id="footer">
         <h3>北平风物记</h3>
-        <p style="margin-bottom: 30px;">一座城市的记忆重构</p>
-        <button class="share-btn" onclick="alert('📸 海报生成中...\n(请自行放入 haibao.png 到 image 文件夹来实现真正的弹窗)')">
+  <p style="margin-bottom: 30px;">一座城市的记忆重构</p>
+        <button class="share-btn" onclick="generatePoster('literature-poster.jpg')">
             生成我的漫游海报
+        </button>
+        <button class="share-btn" style="margin-left: 15px; background: var(--c-gold);" onclick="showQuiz('literature')">
+            文化知识小测试
         </button>
         <p style="margin-top: 60px; font-size: 0.8rem; opacity: 0.5;">&copy; 2026 北平风物记</p>
     </footer>
@@ -412,15 +461,16 @@
                 piece.dataset.answer = line;
                 piece.style.cssText = `
                     background: var(--c-paper);
-                    border: 2px solid var(--c-gray);
-                    border-radius: 8px;
-                    padding: 15px 25px;
+                    border: 2px solid var(--c-gold);
+                    border-radius: 4px;
+                    padding: 20px 30px;
                     cursor: pointer;
                     transition: all 0.3s ease;
-                    font-size: 1.1rem;
+                    font-size: 1.2rem;
                     font-family: var(--f-body);
                     color: var(--c-ink);
-                    box-shadow: 0 4px 10px rgba(0,0,0,0.05);
+                    box-shadow: 10px 10px 0px rgba(0,0,0,0.05);
+                    filter: sepia(0.1);
                 `;
                 
                 // 添加点击事件
@@ -498,6 +548,374 @@
 
         // 初始化游戏
         initPoemPuzzle();
+        
+        // --- 文化知识小测试功能 ---        
+        function initQuiz() {
+            // 创建答题模态框
+            const quizModal = document.createElement('div');
+            quizModal.id = 'quiz-modal';
+            quizModal.style.cssText = `
+                position: fixed;
+                top: 0;
+                left: 0;
+                width: 100%;
+                height: 100%;
+                background: rgba(0, 0, 0, 0.8);
+                z-index: 2000;
+                display: none;
+                justify-content: center;
+                align-items: center;
+            `;
+            
+            quizModal.innerHTML = `
+                <div style="background: white; padding: 40px; border-radius: 10px; max-width: 600px; width: 90%; max-height: 80vh; overflow-y: auto;">
+                    <h3 style="font-family: var(--f-title); font-size: 1.8rem; color: var(--c-red); margin-bottom: 30px; text-align: center;">文化知识小测试</h3>
+                    <div id="quiz-content"></div>
+                    <div id="quiz-result" style="margin-top: 20px; padding: 20px; background: var(--c-paper); border-radius: 8px; display: none;"></div>
+                    <div style="display: flex; gap: 15px; justify-content: center; margin-top: 30px;">
+                        <button id="quiz-submit" class="view-btn" style="display: none;">提交答案</button>
+                        <button id="quiz-close" class="view-btn" style="background: var(--c-gray);">关闭</button>
+                    </div>
+                </div>
+            `;
+            
+            document.body.appendChild(quizModal);
+            
+            // 关闭模态框
+            document.getElementById('quiz-close').addEventListener('click', function() {
+                quizModal.style.display = 'none';
+            });
+            
+            // 文化知识题库 - 按景点分类
+            const quizQuestionsBySpot = {
+                'literature': [
+                    {
+                        question: '万松老人塔是为了纪念哪位历史人物而建？',
+                        options: ['A. 万松行秀', 'B. 乾隆皇帝', 'C. 纳兰性德', 'D. 曹雪芹'],
+                        correct: 0
+                    },
+                    {
+                        question: '万松老人塔现位于北京西四南大街，其最初的建造年代是？',
+                        options: ['A. 唐代', 'B. 金代', 'C. 元代', 'D. 明代'],
+                        correct: 2
+                    },
+                    {
+                        question: '万松老人塔曾因年久失修损毁，近代对其进行重修并保护的知名人物是？',
+                        options: ['A. 梁思成', 'B. 朱启钤', 'C. 林徽因', 'D. 郭沫若'],
+                        correct: 1
+                    }
+                ],
+                'jiangnan': [
+                    {
+                        question: '紫竹院公园以竹景闻名，其建园的核心水系依托于北京哪一处古河道？',
+                        options: ['A. 通惠河', 'B. 莲花河', 'C. 高粱河', 'D. 护城河'],
+                        correct: 2
+                    },
+                    {
+                        question: '紫竹院公园内的"福荫紫竹院"庙宇，最初是为了供奉哪位佛教人物而建？',
+                        options: ['A. 观音菩萨', 'B. 文殊菩萨', 'C. 普贤菩萨', 'D. 地藏菩萨'],
+                        correct: 0
+                    },
+                    {
+                        question: '紫竹院公园的名字由来，与以下哪一历史背景相关？',
+                        options: ['A. 清代宫廷种紫竹祈福', 'B. 明代寺庙旁紫竹成林', 'C. 元代文人在此种竹题诗', 'D. 辽代皇家园林植竹造景'],
+                        correct: 1
+                    }
+                ],
+                'ditan': [
+                    {
+                        question: '地坛公园是明清帝王祭祀"皇地祇神"的场所，其与天坛南北对应，地坛祭祀的核心是祈求什么？',
+                        options: ['A. 五谷丰登、土地安宁', 'B. 风调雨顺、国运昌隆', 'C. 子孙绵延、皇室兴旺', 'D. 消灾避祸、百姓安康'],
+                        correct: 0
+                    },
+                    {
+                        question: '地坛公园内的核心建筑方泽坛，其台面铺砌的石块数遵循的是哪种古代数字理念？',
+                        options: ['A. 阴阳五行', 'B. 天圆地方', 'C. 九五之尊', 'D. 四象八卦'],
+                        correct: 1
+                    },
+                    {
+                        question: '史铁生的散文名篇《我与地坛》中，他常去地坛的核心原因是？',
+                        options: ['A. 地坛环境清幽，适合写作创作', 'B. 遭遇人生挫折后，寻求心灵慰藉', 'C. 家住地坛附近，日常散步消遣', 'D. 地坛藏有书籍，便于查阅资料'],
+                        correct: 1
+                    }
+                ]
+            };
+            
+            // 显示答题
+            window.showQuiz = function(spotId = 'literature') {
+                const quizContent = document.getElementById('quiz-content');
+                const quizResult = document.getElementById('quiz-result');
+                const quizSubmit = document.getElementById('quiz-submit');
+                
+                // 重置答题状态
+                quizResult.style.display = 'none';
+                quizSubmit.style.display = 'block';
+                
+                // 获取对应景点的题目
+                const quizQuestions = quizQuestionsBySpot[spotId] || quizQuestionsBySpot['literature'];
+                
+                // 生成题目HTML
+                let quizHTML = '';
+                quizQuestions.forEach((q, index) => {
+                    quizHTML += `
+                        <div style="margin-bottom: 25px;">
+                            <p style="font-size: 1.1rem; margin-bottom: 15px; font-weight: bold;">${index + 1}. ${q.question}</p>
+                            <div style="display: flex; flex-direction: column; gap: 10px;">
+                                ${q.options.map((option, optIndex) => `
+                                    <label style="display: flex; align-items: center; gap: 10px; cursor: pointer; padding: 10px; border-radius: 4px; transition: background-color 0.2s;">
+                                        <input type="radio" name="quiz-${index}" value="${optIndex}" style="accent-color: var(--c-red);">
+                                        <span>${option}</span>
+                                    </label>
+                                `).join('')}
+                            </div>
+                        </div>
+                    `;
+                });
+                
+                quizContent.innerHTML = quizHTML;
+                quizModal.style.display = 'flex';
+                
+                // 存储当前景点ID，用于提交答案时使用
+                quizModal.dataset.currentSpot = spotId;
+            };
+            
+            // 提交答案
+            document.getElementById('quiz-submit').addEventListener('click', function() {
+                const spotId = quizModal.dataset.currentSpot || 'literature';
+                const quizQuestions = quizQuestionsBySpot[spotId] || quizQuestionsBySpot['literature'];
+                
+                let correctCount = 0;
+                let wrongAnswers = [];
+                
+                quizQuestions.forEach((q, index) => {
+                    const selectedOption = document.querySelector(`input[name="quiz-${index}"]:checked`);
+                    const selectedValue = selectedOption ? parseInt(selectedOption.value) : -1;
+                    
+                    if (selectedValue === q.correct) {
+                        correctCount++;
+                    } else {
+                        wrongAnswers.push({
+                            index: index,
+                            question: q.question,
+                            selectedAnswer: selectedValue >= 0 ? q.options[selectedValue] : '未作答',
+                            correctAnswer: q.options[q.correct]
+                        });
+                    }
+                });
+                
+                // 显示结果
+                const quizResult = document.getElementById('quiz-result');
+                const quizSubmit = document.getElementById('quiz-submit');
+                
+                let resultHTML = `
+                    <h4 style="color: var(--c-red); margin-bottom: 15px;">测试结果</h4>
+                    <p>你答对了 ${correctCount}/${quizQuestions.length} 道题！</p>
+                    ${correctCount === quizQuestions.length ? 
+                        '<p style="color: var(--c-gold);">🎉 恭喜你全部答对！</p>' : 
+                        '<p style="color: var(--c-gray);">继续加油，了解更多北平文化！</p>'
+                    }
+                `;
+                
+                // 添加错误题目及正确答案
+                if (wrongAnswers.length > 0) {
+                    resultHTML += `
+                        <div style="margin-top: 20px; padding-top: 20px; border-top: 1px solid #eee;">
+                            <h5 style="color: var(--c-red); margin-bottom: 15px;">错误题目及正确答案：</h5>
+                            <ul style="list-style: none; padding: 0; margin: 0;">
+                                ${wrongAnswers.map(item => `
+                                    <li style="margin-bottom: 15px; padding: 10px; background: #f9f9f9; border-radius: 4px;">
+                                        <p style="margin-bottom: 8px;"><strong>${item.index + 1}. ${item.question}</strong></p>
+                                        <p style="margin: 4px 0;">你的答案：<span style="color: #999;">${item.selectedAnswer}</span></p>
+                                        <p style="margin: 4px 0;">正确答案：<span style="color: var(--c-red); font-weight: bold;">${item.correctAnswer}</span></p>
+                                    </li>
+                                `).join('')}
+                            </ul>
+                        </div>
+                    `;
+                }
+                
+                quizResult.innerHTML = resultHTML;
+                quizResult.style.display = 'block';
+                quizSubmit.style.display = 'none';
+            });
+        }
+        
+        // 初始化文化知识小测试
+        initQuiz();
+
+        // 自动收集对应路线的印章
+        function collectRouteStamp() {
+            // 从localStorage加载集章状态
+            const stamps = JSON.parse(localStorage.getItem('beipingStamps')) || {};
+            
+            // 标记当前路线印章为已收集
+            stamps['literature'] = true;
+            
+            // 保存到localStorage
+            localStorage.setItem('beipingStamps', JSON.stringify(stamps));
+            
+            // 如果所有路线都已收集，收集特殊印章
+            if (stamps['literature'] && stamps['jiangnan'] && stamps['ditan']) {
+                stamps['explorer'] = true;
+                stamps['heritage'] = true;
+                localStorage.setItem('beipingStamps', JSON.stringify(stamps));
+            }
+        }
+
+        // 页面加载时自动收集印章
+        collectRouteStamp();
+
+// --- 海报生成功能 ---
+function generatePoster(posterImage) {
+    // 创建海报预览弹窗
+    const modal = document.createElement('div');
+    modal.style.cssText = `
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        background: rgba(0, 0, 0, 0.8);
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        z-index: 9999;
+        padding: 20px;
+    `;
+    
+    // 创建海报容器
+    const posterContainer = document.createElement('div');
+    posterContainer.style.cssText = `
+        background: white;
+        padding: 20px;
+        border-radius: 8px;
+        max-width: 600px;
+        max-height: 80vh;
+        overflow: auto;
+        text-align: center;
+        box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
+    `;
+    
+    // 创建海报标题
+    const posterTitle = document.createElement('h3');
+    posterTitle.textContent = '我的文学漫游海报';
+    posterTitle.style.cssText = `
+        margin-bottom: 20px;
+        color: var(--c-red);
+        font-family: var(--f-title);
+        font-size: 1.8rem;
+    `;
+    
+    // 创建海报图片
+    const posterImg = document.createElement('img');
+    posterImg.src = `image/${posterImage}`;
+    posterImg.alt = '漫游海报';
+    posterImg.style.cssText = `
+        width: 100%;
+        max-height: 60vh;
+        object-fit: contain;
+        border-radius: 4px;
+        margin-bottom: 20px;
+    `;
+    
+    // 创建下载按钮
+    const downloadBtn = document.createElement('button');
+    downloadBtn.textContent = '下载海报';
+    downloadBtn.style.cssText = `
+        padding: 10px 30px;
+        background: var(--c-ink);
+        color: white;
+        border: none;
+        border-radius: 4px;
+        cursor: pointer;
+        font-family: var(--f-body);
+        font-size: 1rem;
+        transition: all 0.3s ease;
+    `;
+    downloadBtn.onmouseover = function() {
+        this.style.background = 'var(--c-red)';
+    };
+    downloadBtn.onmouseout = function() {
+        this.style.background = 'var(--c-ink)';
+    };
+    downloadBtn.onclick = function() {
+        // 创建下载链接
+        const link = document.createElement('a');
+        link.href = `image/${posterImage}`;
+        link.download = posterImage;
+        link.click();
+    };
+    
+    // 创建关闭按钮
+    const closeBtn = document.createElement('button');
+    closeBtn.textContent = '关闭';
+    closeBtn.style.cssText = `
+        padding: 10px 30px;
+        background: var(--c-red);
+        color: white;
+        border: none;
+        border-radius: 4px;
+        cursor: pointer;
+        font-family: var(--f-body);
+        font-size: 1rem;
+        transition: all 0.3s ease;
+    `;
+    closeBtn.onmouseover = function() {
+        this.style.background = 'var(--c-ink)';
+    };
+    closeBtn.onmouseout = function() {
+        this.style.background = 'var(--c-red)';
+    };
+    closeBtn.onclick = function() {
+        document.body.removeChild(modal);
+    };
+    
+    // 创建按钮容器
+    const btnContainer = document.createElement('div');
+    btnContainer.style.cssText = `
+        display: flex;
+        justify-content: center;
+        gap: 20px;
+    `;
+    
+    // 组合元素
+    btnContainer.appendChild(downloadBtn);
+    btnContainer.appendChild(closeBtn);
+    
+    posterContainer.appendChild(posterTitle);
+    posterContainer.appendChild(posterImg);
+    posterContainer.appendChild(btnContainer);
+    
+    modal.appendChild(posterContainer);
+    document.body.appendChild(modal);
+}
+
+        
+        // 夜间模式切换
+        const themeToggle = document.getElementById('theme-toggle');
+        
+        // 检查本地存储中的主题设置
+        if (localStorage.getItem('theme') === 'dark' || 
+            (!localStorage.getItem('theme') && window.matchMedia('(prefers-color-scheme: dark)').matches)) {
+            document.documentElement.setAttribute('data-theme', 'dark');
+            themeToggle.textContent = '☀️';
+        } else {
+            document.documentElement.setAttribute('data-theme', 'light');
+            themeToggle.textContent = '🌙';
+        }
+        
+        // 切换主题
+        themeToggle.addEventListener('click', function() {
+            if (document.documentElement.getAttribute('data-theme') === 'light') {
+                document.documentElement.setAttribute('data-theme', 'dark');
+                localStorage.setItem('theme', 'dark');
+                themeToggle.textContent = '☀️';
+            } else {
+                document.documentElement.setAttribute('data-theme', 'light');
+                localStorage.setItem('theme', 'light');
+                themeToggle.textContent = '🌙';
+            }
+        });
         
         // --- 音频控制逻辑 ---
 function toggleSound(audioId, btnElement) {

@@ -91,6 +91,47 @@
             --nav-height: 80px;
         }
 
+        /* 夜间模式变量 */
+        [data-theme="dark"] {
+            --c-red: #B84A62;       /* 宫墙红（亮） */
+            --c-ink: #E8E6DC;       /* 宣纸白 */
+            --c-gray: #A8AAAD;      /* 浅灰 */
+            --c-paper: #1A1A1A;     /* 深墨色 */
+            --c-gold: #D4B078;      /* 鎏金（亮） */
+        }
+
+        /* 夜间模式下的卡片和容器调整 */
+        [data-theme="dark"] .concept-card,
+        [data-theme="dark"] .article-block {
+            background: rgba(30, 30, 30, 0.8);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
+        /* 夜间模式下的导航栏调整 */
+        [data-theme="dark"] nav {
+            background: rgba(26, 26, 26, 0.95);
+            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
+        /* 夜间模式下的下拉菜单调整 */
+        [data-theme="dark"] .dropdown {
+            background: rgba(30, 30, 30, 0.98);
+            border-top: 3px solid var(--c-red);
+        }
+
+        [data-theme="dark"] .dropdown a {
+            color: var(--c-gray);
+        }
+
+        [data-theme="dark"] .dropdown a:hover {
+            background: rgba(40, 40, 40, 0.8);
+        }
+
+        /* 夜间模式下的背景调整 */
+        [data-theme="dark"] #about {
+            background: rgba(30, 30, 30, 0.4);
+        }
+
         * { box-sizing: border-box; margin: 0; padding: 0; }
         
         body {
@@ -138,7 +179,7 @@
             display: flex; justify-content: space-between; align-items: center;
             padding: 0 40px; transition: all 0.3s;
         }
-        .logo { font-family: var(--f-title); font-size: 2rem; color: var(--c-red); text-decoration: none; }
+        .logo { display: flex; align-items: center; text-decoration: none; color: var(--c-ink); }
         .menu { display: flex; gap: 40px; height: 100%; align-items: center; }
         .menu-item { position: relative; height: 100%; display: flex; align-items: center; cursor: pointer; font-size: 1rem; color: var(--c-ink); text-decoration: none; transition: 0.3s; }
         .menu-item:hover { color: var(--c-red); }
@@ -153,6 +194,12 @@
         .menu-item:hover .dropdown { opacity: 1; visibility: visible; top: var(--nav-height); }
         .dropdown a { display: block; padding: 12px 30px; color: #666; text-decoration: none; font-size: 0.95rem; transition: 0.2s; white-space: nowrap; }
         .dropdown a:hover { background: var(--c-paper); color: var(--c-red); padding-left: 35px; }
+        
+        /* 主题切换按钮 */
+        .theme-toggle:hover {
+            color: var(--c-red);
+            transform: scale(1.1);
+        }
 
         /* --- 新增：关于我们 / 品牌理念板块 --- */
 #about {
@@ -295,6 +342,8 @@
             </div>
             <a href="about.html" class="menu-item">关于我们</a>
         </div>
+        <!-- 主题切换按钮 -->
+        <button id="theme-toggle" class="theme-toggle" style="background: none; border: none; cursor: pointer; font-size: 1.2rem; color: var(--c-ink); padding: 8px; transition: all 0.3s ease;">🌙</button>
     </nav>
 
     <section id="about">
@@ -331,6 +380,21 @@
                         </div>
                     </div>
                 </div>
+
+                <div class="concept-card" style="grid-column: 1 / -1;">
+                    <div class="concept-title">
+                        <span>03.</span> 联系我们
+                    </div>
+                    <div class="concept-text">
+                        <p><strong>联系方式：</strong>2532765769@qq.com</p>
+                        <p><strong>联系地址：</strong>北京邮电大学沙河校区</p>
+                        <div class="highlight-box">
+                            <p>版权所属：</p>
+                            <p>图片、音乐来源自网络</p>
+                            <p>其余版权所属“北平风物记”</p>
+                        </div>
+                    </div>
+                </div>
             </div>
         </div>
     </section>
@@ -349,6 +413,32 @@
             });
         }, { threshold: 0.1 });
         document.querySelectorAll('.reveal').forEach(el => observer.observe(el));
+        
+        // 夜间模式切换
+        const themeToggle = document.getElementById('theme-toggle');
+        
+        // 检查本地存储中的主题设置
+        if (localStorage.getItem('theme') === 'dark' || 
+            (!localStorage.getItem('theme') && window.matchMedia('(prefers-color-scheme: dark)').matches)) {
+            document.documentElement.setAttribute('data-theme', 'dark');
+            themeToggle.textContent = '☀️';
+        } else {
+            document.documentElement.setAttribute('data-theme', 'light');
+            themeToggle.textContent = '🌙';
+        }
+        
+        // 切换主题
+        themeToggle.addEventListener('click', function() {
+            if (document.documentElement.getAttribute('data-theme') === 'light') {
+                document.documentElement.setAttribute('data-theme', 'dark');
+                localStorage.setItem('theme', 'dark');
+                themeToggle.textContent = '☀️';
+            } else {
+                document.documentElement.setAttribute('data-theme', 'light');
+                localStorage.setItem('theme', 'light');
+                themeToggle.textContent = '🌙';
+            }
+        });
     </script>
 </body>
 </html>

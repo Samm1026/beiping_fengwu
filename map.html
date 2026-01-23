@@ -91,6 +91,49 @@
             --nav-height: 80px;
         }
 
+        /* 夜间模式变量 */
+        [data-theme="dark"] {
+            --c-red: #B84A62;       /* 宫墙红（亮） */
+            --c-ink: #E8E6DC;       /* 宣纸白 */
+            --c-gray: #A8AAAD;      /* 浅灰 */
+            --c-paper: #1A1A1A;     /* 深墨色 */
+            --c-gold: #D4B078;      /* 鎏金（亮） */
+        }
+
+        /* 夜间模式下的卡片和容器调整 */
+        [data-theme="dark"] .route-card,
+        [data-theme="dark"] .concept-card,
+        [data-theme="dark"] .memory-item,
+        [data-theme="dark"] .voice-guide,
+        [data-theme="dark"] .virtual-tour,
+        [data-theme="dark"] .stamp-item,
+        [data-theme="dark"] .user-reviews,
+        [data-theme="dark"] .transport-guide,
+        [data-theme="dark"] .map-card {
+            background: rgba(30, 30, 30, 0.8);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
+        /* 夜间模式下的导航栏调整 */
+        [data-theme="dark"] nav {
+            background: rgba(26, 26, 26, 0.95);
+            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
+        /* 夜间模式下的下拉菜单调整 */
+        [data-theme="dark"] .dropdown {
+            background: rgba(30, 30, 30, 0.98);
+            border-top: 3px solid var(--c-red);
+        }
+
+        [data-theme="dark"] .dropdown a {
+            color: var(--c-gray);
+        }
+
+        [data-theme="dark"] .dropdown a:hover {
+            background: rgba(40, 40, 40, 0.8);
+        }
+
         * { box-sizing: border-box; margin: 0; padding: 0; }
         
         body {
@@ -159,8 +202,8 @@
         .map-container {
             width: 100%; height: 80vh; max-width: 1200px; margin: 0 auto;
             position: relative;
-            /* 修改：使用本地图片 ditu.png */
-            background: url('image/ditu.png') center/cover no-repeat;
+            /* 修改：使用新的地图底图 */
+            background: url('image/new-ditu.jpg') center/cover no-repeat;
             border-radius: 4px; box-shadow: 0 20px 50px rgba(0,0,0,0.1);
         }
         .map-title { position: absolute; top: 40px; left: 40px; font-family: var(--f-title); font-size: 3rem; color: #fff; text-shadow: 0 2px 10px rgba(0,0,0,0.5); z-index: 20; }
@@ -219,17 +262,22 @@
             </div>
             <a href="about.html" class="menu-item">关于我们</a>
         </div>
+        <!-- 夜间模式切换 -->
+        <button id="theme-toggle" class="theme-toggle" style="background: none; border: none; cursor: pointer; font-size: 1.2rem; color: var(--c-ink); padding: 8px; transition: all 0.3s ease;">
+            🌙
+        </button>
     </nav>
 
     <section id="map-section">
         <div class="map-container">
             <div class="map-title">风物地图</div>
             
-            <div class="pin" style="top: 45%; left: 40%;" onclick="showMapCard('literature')"></div>
-            <div class="pin" style="top: 30%; left: 25%;" onclick="showMapCard('jiangnan')"></div>
-            <div class="pin" style="top: 25%; left: 60%;" onclick="showMapCard('ditan')"></div>
+            <div class="pin" style="top: 65%; left: 44%;" onclick="showMapCard('literature')"></div>
+            <div class="pin" style="top: 55%; left: 25%;" onclick="showMapCard('jiangnan')"></div>
+            <div class="pin" style="top: 53%; left: 57%;" onclick="showMapCard('ditan')"></div>
 
             <div class="map-card" id="map-card-content">
+                <img id="card-image" src="" alt="景点图片" style="width: 100%; height: 150px; object-fit: cover; border-radius: 4px; margin-bottom: 15px;">
                 <h3 id="card-title" style="font-size: 1.5rem; margin-bottom: 10px; color: var(--c-red);">地点名称</h3>
                 <p id="card-desc" style="color: #666; line-height: 1.6; margin-bottom: 20px;">地点描述信息...</p>
                 <a id="card-link" href="#" style="color: var(--c-ink); font-weight: bold; text-decoration: none; border-bottom: 1px solid currentColor;">进入路线 &rarr;</a>
@@ -246,9 +294,9 @@
     <script>
         // 地图数据
         const mapData = {
-            'literature': { title: '古塔与书局', desc: '西四南大街的万松老人塔与正阳书局。', link: 'literature-route.html' },
-            'jiangnan': { title: '紫竹院', desc: '皇家园林的南渡梦影。', link: 'jiangnan-route.html' },
-            'ditan': { title: '地坛公园', desc: '史铁生的精神家园。', link: 'ditan-route.html' }
+            'literature': { title: '古塔与书局', desc: '西四南大街的万松老人塔与正阳书局。', link: 'literature-route.html', image: 'image/wansongta.png' },
+            'jiangnan': { title: '紫竹院', desc: '皇家园林的南渡梦影。', link: 'jiangnan-route.html', image: 'image/jiangnan.jpg' },
+            'ditan': { title: '地坛公园', desc: '史铁生的精神家园。', link: 'ditan-route.html', image: 'image/ditan.jpg' }
         };
 
         function showMapCard(key) {
@@ -257,6 +305,8 @@
             card.style.opacity = 0;
             card.style.transform = 'translateY(10px)';
             setTimeout(() => {
+                document.getElementById('card-image').src = data.image;
+                document.getElementById('card-image').alt = data.title;
                 document.getElementById('card-title').innerText = data.title;
                 document.getElementById('card-desc').innerText = data.desc;
                 document.getElementById('card-link').href = data.link;
@@ -265,6 +315,32 @@
                 card.style.transform = 'translateY(0)';
             }, 300);
         }
+
+        // 夜间模式切换
+        const themeToggle = document.getElementById('theme-toggle');
+        
+        // 检查本地存储中的主题设置
+        if (localStorage.getItem('theme') === 'dark' || 
+            (!localStorage.getItem('theme') && window.matchMedia('(prefers-color-scheme: dark)').matches)) {
+            document.documentElement.setAttribute('data-theme', 'dark');
+            themeToggle.textContent = '☀️';
+        } else {
+            document.documentElement.setAttribute('data-theme', 'light');
+            themeToggle.textContent = '🌙';
+        }
+        
+        // 切换主题
+        themeToggle.addEventListener('click', function() {
+            if (document.documentElement.getAttribute('data-theme') === 'light') {
+                document.documentElement.setAttribute('data-theme', 'dark');
+                localStorage.setItem('theme', 'dark');
+                themeToggle.textContent = '☀️';
+            } else {
+                document.documentElement.setAttribute('data-theme', 'light');
+                localStorage.setItem('theme', 'light');
+                themeToggle.textContent = '🌙';
+            }
+        });
     </script>
 </body>
 </html>
